@@ -1,20 +1,5 @@
 diff --git a/ccx_2.14/src/ccx_2.14.c b/ccx_2.14/src/ccx_2.14.c
 index e53d6f4..e08526e 100644
---- a/ccx_2.14/src/ccx_2.14.c
-+++ b/ccx_2.14/src/ccx_2.14.c
-@@ -15,9 +15,9 @@
- /*     along with this program; if not, write to the Free Software       */
- /*     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.         */
-
--#ifdef __WIN32
--  _set_output_format(_TWO_DIGIT_EXPONENT);
--#endif
-+// #ifdef __WIN32
-+//   _set_output_format(_TWO_DIGIT_EXPONENT);
-+// #endif
-
- #ifdef CALCULIX_MPI
- #include <spoolesMPI.h>
 @@ -120,7 +120,9 @@ else{
      strcpy(output,argv[i+1]);break;}
    }
