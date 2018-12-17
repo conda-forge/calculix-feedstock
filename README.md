@@ -16,8 +16,7 @@ A Free Software Three-Dimensional Structural Finite Element Program
 Current build status
 ====================
 
-[![Linux](https://img.shields.io/circleci/project/github/conda-forge/calculix-feedstock/master.svg?label=Linux)](https://circleci.com/gh/conda-forge/calculix-feedstock)
-[![OSX](https://img.shields.io/travis/conda-forge/calculix-feedstock/master.svg?label=macOS)](https://travis-ci.org/conda-forge/calculix-feedstock)
+[![Linux,OSX](https://img.shields.io/circleci/project/github/conda-forge/calculix-feedstock/master.svg?label=Linux,OSX)](https://circleci.com/gh/conda-forge/calculix-feedstock)
 [![Windows](https://img.shields.io/appveyor/ci/conda-forge/calculix-feedstock/master.svg?label=Windows)](https://ci.appveyor.com/project/conda-forge/calculix-feedstock/branch/master)
 
 Current release info
