@@ -1,22 +1,26 @@
 diff --git a/ccx_2.15/src/ccx_2.15.c b/ccx_2.15/src/ccx_2.15.c
-index e53d6f4..52ad691 100644
+index 3ab1cb5..4a755c0 100644
 --- a/ccx_2.15/src/ccx_2.15.c
 +++ b/ccx_2.15/src/ccx_2.15.c
-@@ -15,9 +15,6 @@
+@@ -15,9 +15,9 @@
  /*     along with this program; if not, write to the Free Software       */
  /*     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.         */
 
 -#ifdef __WIN32
 -  _set_output_format(_TWO_DIGIT_EXPONENT);
 -#endif
++//#ifdef __WIN32
++//  _set_output_format(_TWO_DIGIT_EXPONENT);
++//#endif
 
  #ifdef CALCULIX_MPI
  #include <spoolesMPI.h>
-@@ -35,7 +32,10 @@ ITG myid = 0, nproc = 0;
+@@ -35,7 +35,11 @@ ITG myid = 0, nproc = 0;
 
  int main(int argc,char *argv[])
  {
 -
++
 +#ifdef __WIN32
 +  _set_output_format(_TWO_DIGIT_EXPONENT);
 +#endif
@@ -24,16 +28,3 @@ index e53d6f4..52ad691 100644
  FILE *f1;
 
  char *sideload=NULL, *set=NULL, *matname=NULL, *orname=NULL, *amname=NULL,
-@@ -120,7 +120,11 @@ else{
-     strcpy(output,argv[i+1]);break;}
-   }
- }
--setenv("CCX_JOBNAME_GETJOBNAME",jobnamec,1);
-+
-+
-+//https://stackoverflow.com/questions/52668364/how-can-i-avoid-this-error-with-setenv-in-c/52672155#52672155
-+//setenv("CCX_JOBNAME_GETJOBNAME",jobnamec,1);
-+putenv("CCX_JOBNAME_GETJOBNAME=jobnamec");
-
- #ifdef BAM
- ITG lop=0,lrestart=0,kstep=1,kinc=1;
