@@ -1,7 +1,7 @@
-diff --git a/ccx_2.14/src/ccx_2.14.c b/ccx_2.14/src/ccx_2.14.c
+diff --git a/ccx_2.15/src/ccx_2.15.c b/ccx_2.15/src/ccx_2.15.c
 index e53d6f4..52ad691 100644
---- a/ccx_2.14/src/ccx_2.14.c
-+++ b/ccx_2.14/src/ccx_2.14.c
+--- a/ccx_2.15/src/ccx_2.15.c
++++ b/ccx_2.15/src/ccx_2.15.c
 @@ -15,9 +15,6 @@
  /*     along with this program; if not, write to the Free Software       */
  /*     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.         */
