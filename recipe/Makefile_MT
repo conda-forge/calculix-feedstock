@@ -11,7 +11,7 @@ FFLAGS += -Wall -O3 -fopenmp
 
 include Makefile.inc
 
-SCCXMAIN = ccx_2.14.c
+SCCXMAIN = ccx_$(VERSION).c
 
 OCCXF = $(SCCXF:.f=.o)
 OCCXC = $(SCCXC:.c=.o)
@@ -23,8 +23,8 @@ LIBS = \
     $(LIB_DIR)/spooles.a \
     $(LIB_DIR)/libopenblas.a
 
-ccx_2.14_MT: $(OCCXMAIN) ccx_2.14_MT.a  $(LIBS)
-	./date.pl; $(CC) $(CFLAGS) -c ccx_2.14.c; $(FC) $(FFLAGS) -o $@ $(OCCXMAIN) ccx_2.14_MT.a $(LIBS)
+ccx_$(VERSION)_MT: $(OCCXMAIN) ccx_$(VERSION)_MT.a  $(LIBS)
+	./date.pl; $(CC) $(CFLAGS) -c ccx_$(VERSION).c; $(FC) $(FFLAGS) -o $@ $(OCCXMAIN) ccx_$(VERSION)_MT.a $(LIBS)
 
-ccx_2.14_MT.a: $(OCCXF) $(OCCXC)
+ccx_$(VERSION)_MT.a: $(OCCXF) $(OCCXC)
 	$(AR) vr $@ $?
