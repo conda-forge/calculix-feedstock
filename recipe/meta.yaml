@@ -26,11 +26,15 @@ requirements:
         - {{ compiler("fortran") }}  # [unix]
         - {{ compiler('m2w64_fortran') }}  # [win]
         - perl
+        - llvm-openmp  # [osx]
     host:
         - arpack
         - spooles
         - openblas
         - m2w64-openblas  # [win]
+        - llvm-openmp  # [osx]
+    run:
+        - llvm-openmp  # [osx]
 
 test:
     commands:
