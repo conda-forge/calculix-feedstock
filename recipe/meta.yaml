@@ -14,7 +14,7 @@ source:
         - mingw.patch  # [win]
 
 build:
-    number: 1001
+    number: 1002
     {% if compiler("c").startswith("toolchain_c") %}  # [osx]
     skip: true                                        # [osx]
     {% endif %}                                       # [osx]
@@ -28,9 +28,10 @@ requirements:
         - perl
         - llvm-openmp  # [osx]
     host:
+      - libblas
+      - libcblas
         - arpack
         - spooles
-        - openblas
         - m2w64-openblas  # [win]
         - llvm-openmp  # [osx]
     run:
