@@ -3,56 +3,53 @@
 {% set sha256 = "a4354c33e14dd3da5f5babd607bbd553667055dceef71b3bbc0d98a741be1c9f" %}
 
 package:
-    name: {{ name }}
-    version: {{ version }}
+  name: {{ name }}
+  version: {{ version }}
 
 source:
-    fn: {{ name }}_{{ version }}.tar.bz2
-    url: http://www.dhondt.de/ccx_{{ version }}.src.tar.bz2
-    sha256: {{ sha256 }}
-    patches:
-        - mingw.patch  # [win]
+  fn: {{ name }}_{{ version }}.tar.bz2
+  url: http://www.dhondt.de/ccx_{{ version }}.src.tar.bz2
+  sha256: {{ sha256 }}
+  patches:
+    - mingw.patch  # [win]
 
 build:
-    number: 1002
-    {% if compiler("c").startswith("toolchain_c") %}  # [osx]
-    skip: true                                        # [osx]
-    {% endif %}                                       # [osx]
+  number: 1002
 
 requirements:
-    build:
-        - {{ compiler("c") }}  # [unix]
-        - {{ compiler('m2w64_c') }}  # [win]
-        - {{ compiler("fortran") }}  # [unix]
-        - {{ compiler('m2w64_fortran') }}  # [win]
-        - perl
-        - llvm-openmp  # [osx]
-    host:
-      - libblas
-      - libcblas
-        - arpack
-        - spooles
-        - m2w64-openblas  # [win]
-        - llvm-openmp  # [osx]
-    run:
-        - llvm-openmp  # [osx]
+  build:
+    - {{ compiler("c") }}  # [unix]
+    - {{ compiler('m2w64_c') }}  # [win]
+    - {{ compiler("fortran") }}  # [unix]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - perl
+    - llvm-openmp  # [osx]
+  host:
+    - libblas
+    - libcblas
+    - arpack
+    - spooles
+    - m2w64-openblas  # [win]
+    - llvm-openmp  # [osx]
+  run:
+    - llvm-openmp  # [osx]
 
 test:
-    commands:
-        - test -f ${PREFIX}/bin/ccx  # [unix]
-        - test -f %LIBRARY_PREFIX%\bin\ccx.exe  # [win]
+  commands:
+    - test -f ${PREFIX}/bin/ccx  # [unix]
+    - test -f %LIBRARY_PREFIX%\bin\ccx.exe  # [win]
 
 about:
-    home: http://www.dhondt.de/
-    license: GPL 2
-    license_family: GPL
-    license_file: '{{ environ["RECIPE_DIR"] }}/LICENSE'
-    summary: 3D Structural Finite Element Program
-    description: A Free Software Three-Dimensional Structural
-                 Finite Element Program
-    doc_url: http://www.dhondt.de/ccx_2.14.pdf
-    dev_url: http://www.dhondt.de/
+  home: http://www.dhondt.de/
+  license: GPL 2
+  license_family: GPL
+  license_file: '{{ environ["RECIPE_DIR"] }}/LICENSE'
+  summary: 3D Structural Finite Element Program
+  description: A Free Software Three-Dimensional Structural
+               Finite Element Program
+  doc_url: http://www.dhondt.de/ccx_2.14.pdf
+  dev_url: http://www.dhondt.de/
 
 extra:
-    recipe-maintainers:
-        - looooo
+  recipe-maintainers:
+    - looooo
