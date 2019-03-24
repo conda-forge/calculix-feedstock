@@ -25,11 +25,12 @@ requirements:
     - perl
     - llvm-openmp  # [osx]
   host:
+    - libblas
     - arpack
-    - openblas
     - spooles
     - llvm-openmp  # [osx]
   run:
+    - arpack
     - llvm-openmp  # [osx]
 
 test:
