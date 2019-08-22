@@ -7,5 +7,6 @@ make -f Makefile_MT \
     LIB_DIR="${PREFIX}/lib" \
     VERSION="${PKG_VERSION}" -j${CPU_COUNT}
 
-cp ccx_*_MT $PREFIX/bin/ccx
+mkdir -p ${PREFIX}/bin
+cp ccx_*_MT ${PREFIX}/bin/ccx
 cd $SRC_DIR
