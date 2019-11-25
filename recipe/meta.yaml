@@ -12,6 +12,7 @@ source:
   sha256: {{ sha256 }}
   patches:
     - mingw.patch  # [win]
+    - ccx_2.16_include_time.patch
 
 build:
   number: 0

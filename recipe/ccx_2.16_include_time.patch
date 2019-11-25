@@ -1,0 +1,12 @@
+diff --git a/ccx_2.16/src/precontact_mortar.c b/ccx_2.16/src/precontact_mortar.c
+index 9f7aa08..72d675b 100644
+--- a/ccx_2.16/src/precontact_mortar.c
++++ b/ccx_2.16/src/precontact_mortar.c
+@@ -18,6 +18,7 @@
+ #include <stdio.h>
+ #include <math.h>
+ #include <stdlib.h>
++#include <time.h>
+ #include "CalculiX.h"
+ #include "mortar.h"
+ #ifdef SPOOLES
