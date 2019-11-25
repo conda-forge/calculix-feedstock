@@ -26,6 +26,7 @@ requirements:
     - llvm-openmp  # [osx]
   host:
     - libblas
+    - liblapack
     - arpack
     - spooles
     - llvm-openmp  # [osx]
