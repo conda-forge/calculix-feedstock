@@ -1,6 +1,7 @@
 {% set name = "calculix" %}
 {% set version = "2.16" %}
-{% set sha256 = "c961b014fb601a0d020216964d4de791d1b9a4b383b6fae5093a1960b77cd0d0" %}
+{% set sha256 = "8f074a402dbd8196d90e476801d502748cf78342f1e881096b398b9d2f897f5d" %}
+
 
 package:
   name: {{ name }}
