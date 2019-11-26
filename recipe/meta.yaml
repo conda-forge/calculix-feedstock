@@ -1,6 +1,7 @@
 {% set name = "calculix" %}
-{% set version = "2.15" %}
-{% set sha256 = "bc7dba721935af51b60c1b5aa1529a420476fc6432a7bec5254f8dfabaeb8a34" %}
+{% set version = "2.16" %}
+{% set sha256 = "8f074a402dbd8196d90e476801d502748cf78342f1e881096b398b9d2f897f5d" %}
+
 
 package:
   name: {{ name }}
@@ -12,9 +13,10 @@ source:
   sha256: {{ sha256 }}
   patches:
     - mingw.patch  # [win]
+    # - ccx_2.16_include_time.patch
 
 build:
-  number: 1004
+  number: 0
 
 requirements:
   build:
@@ -26,6 +28,7 @@ requirements:
     - llvm-openmp  # [osx]
   host:
     - libblas
+    - liblapack
     - arpack
     - spooles
     - llvm-openmp  # [osx]
