@@ -1,6 +1,6 @@
 {% set name = "calculix" %}
 {% set version = "2.16" %}
-{% set sha256 = "8f074a402dbd8196d90e476801d502748cf78342f1e881096b398b9d2f897f5d" %}
+{% set sha256 = "ebd95a0e4d52a3a8fb969eefc85417c82f649f25526bb6d83d69868ab44d47b7" %}
 
 
 package:
@@ -13,7 +13,6 @@ source:
   sha256: {{ sha256 }}
   patches:
     - mingw.patch  # [win]
-    # - ccx_2.16_include_time.patch
 
 build:
   number: 0
