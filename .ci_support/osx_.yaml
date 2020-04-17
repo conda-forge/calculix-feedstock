@@ -1,7 +1,7 @@
 MACOSX_DEPLOYMENT_TARGET:
 - '10.9'
 arpack:
-- 3.6.3
+- '3.7'
 c_compiler:
 - clang
 c_compiler_version:
