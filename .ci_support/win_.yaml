@@ -1,5 +1,5 @@
 arpack:
-- 3.6.3
+- '3.7'
 channel_sources:
 - conda-forge,defaults
 channel_targets:
