@@ -1,6 +1,6 @@
 {% set name = "calculix" %}
-{% set version = "2.16" %}
-{% set sha256 = "ebd95a0e4d52a3a8fb969eefc85417c82f649f25526bb6d83d69868ab44d47b7" %}
+{% set version = "2.17" %}
+{% set sha256 = "001f1cd933fa3d3d81b54a313490588b17805dd4845abfe71a77f33002757ef2" %}
 
 
 package:
@@ -15,7 +15,7 @@ source:
     - mingw.patch  # [win]
 
 build:
-  number: 2
+  number: 0
 
 requirements:
   build:
@@ -44,10 +44,9 @@ about:
   home: http://www.dhondt.de/
   license: GPL 2
   license_family: GPL
-  license_file: '{{ environ["RECIPE_DIR"] }}/LICENSE'
+  license_file: {{ environ["RECIPE_DIR"] }}/LICENSE
   summary: 3D Structural Finite Element Program
-  description: A Free Software Three-Dimensional Structural
-               Finite Element Program
+  description: A Free Software Three-Dimensional Structural Finite Element Program
   doc_url: http://www.dhondt.de/ccx_{{ version }}.pdf
   dev_url: http://www.dhondt.de/
 
