@@ -11,8 +11,6 @@ source:
   fn: {{ name }}_{{ version }}.tar.bz2
   url: http://www.dhondt.de/ccx_{{ version }}.src.tar.bz2
   sha256: {{ sha256 }}
-  patches:
-    - mingw.patch  # [win]
 
 build:
   number: 0
