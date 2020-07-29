@@ -1,8 +1,7 @@
 cd ccx*/src
-
-rm Makefile_MT
-CP %RECIPE_DIR%\Makefile_MT Makefile_MT
-CP %BUILD_PREFIX%\Library\mingw-w64\bin\mingw32-make %BUILD_PREFIX%\Library\mingw-w64\bin\make
+DEL Makefile_MT
+COPY %RECIPE_DIR%\Makefile_MT Makefile_MT
+COPY %BUILD_PREFIX%\Library\mingw-w64\bin\mingw32-make %BUILD_PREFIX%\Library\mingw-w64\bin\make
 
 
 REM this line translates the windows-paths to paths understandable for the mingw env
@@ -17,5 +16,5 @@ make -f Makefile_MT ^
     VERSION="%PKG_VERSION%"
 
 REM adding .exe to make the file executable
-cp ccx_*_MT "%LIBRARY_PREFIX%/bin/ccx.exe"
+COPY ccx_*_MT "%LIBRARY_PREFIX%/bin/ccx.exe"
 cd %SRC_DIR%
