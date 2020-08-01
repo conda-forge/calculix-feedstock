@@ -11,7 +11,7 @@ FOR /F "delims=\" %%i IN ('cygpath.exe -m "%LIBRARY_PREFIX%"') DO set "LIBRARY_P
 make -f Makefile_MT ^
     SPOOLES_INCLUDE_DIR="%LIBRARY_PREFIX%/mingw-w64/include/spooles" ^
     LIB_DIR="%LIBRARY_PREFIX%/mingw-w64/lib" ^
-    LDFLAGS="-L%LIBRARY_PREFIX%/mingw-w64/lib -L%LIBRARY_PREFIX%/lib" ^
+    LDFLAGS="-L%LIBRARY_PREFIX%/mingw-w64/lib -L%LIBRARY_PREFIX%/lib -lrt" ^
     FC="gfortran" ^
     VERSION="%PKG_VERSION%"
 
