@@ -1,3 +1,48 @@
+diff --git a/ccx_2.17/src/CalculiXstep.c b/ccx_2.17/src/CalculiXstep.c
+index 8e83d3e..82535a3 100644
+--- a/ccx_2.17/src/CalculiXstep.c
++++ b/ccx_2.17/src/CalculiXstep.c
+@@ -33,7 +33,7 @@ _set_output_format(_TWO_DIGIT_EXPONENT);
+ ITG myid = 0,nproc = 0;
+ #endif
+ 
+-struct timespec totalCalculixTimeStart,totalCalculixTimeEnd; 
++// struct timespec totalCalculixTimeStart,totalCalculixTimeEnd; 
+ 
+ void CalculiXstep(int argc,char argv[][133],ITG **nelemloadp,double **xloadp,
+ 		  ITG *nload,char **sideloadp,double *timepar,ITG *ne,
+@@ -257,7 +257,7 @@ void CalculiXstep(int argc,char argv[][133],ITG **nelemloadp,double **xloadp,
+     // end change DLR
+ 
+    
+-    clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeStart);
++    // clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeStart);
+ 
+     if(argc==1){printf("Usage: CalculiX.exe -i jobname\n");FORTRAN(stop,());}
+     else{
+@@ -2023,16 +2023,16 @@ void CalculiXstep(int argc,char argv[][133],ITG **nelemloadp,double **xloadp,
+   calculix_freeExternalBehaviours();
+ #endif /* CALCULIX_EXTERNAL_BEHAVIOURS_SUPPORT */
+ 
+-  clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeEnd); 
++  // clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeEnd); 
+ 
+-  totalCalculixTime = (totalCalculixTimeEnd.tv_sec - totalCalculixTimeStart.tv_sec) * 1e9; 
+-  totalCalculixTime = (totalCalculixTime + (totalCalculixTimeEnd.tv_nsec - totalCalculixTimeStart.tv_nsec)) * 1e-9;
++  // totalCalculixTime = (totalCalculixTimeEnd.tv_sec - totalCalculixTimeStart.tv_sec) * 1e9; 
++  // totalCalculixTime = (totalCalculixTime + (totalCalculixTimeEnd.tv_nsec - totalCalculixTimeStart.tv_nsec)) * 1e-9;
+   
+-  printf("________________________________________\n\n");
++  // printf("________________________________________\n\n");
+   
+-  printf("Total CalculiX Time: %lf\n", totalCalculixTime);
++  // printf("Total CalculiX Time: %lf\n", totalCalculixTime);
+ 
+-  printf("________________________________________\n");
++  // printf("________________________________________\n");
+ 
+   return;
+       
 diff --git a/ccx_2.17/src/ccx_2.17.c b/ccx_2.17/src/ccx_2.17.c
 index d1e6aa1..aede1b0 100644
 --- a/ccx_2.17/src/ccx_2.17.c
