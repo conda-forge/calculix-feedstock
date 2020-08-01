@@ -1,7 +1,9 @@
 cd ccx*/src
 rm Makefile_MT
 cp ${RECIPE_DIR}/Makefile_MT Makefile_MT
-export LDFLAGS="${LDFLAGS} -lrt"
+if [[ ${HOST} =~ .*linux.* ]]; then
+	export LDFLAGS="${LDFLAGS} -lrt"
+fi
 
 make -f Makefile_MT \
     SPOOLES_INCLUDE_DIR="${PREFIX}/include/spooles" \
