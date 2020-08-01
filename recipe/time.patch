@@ -1,0 +1,12 @@
+diff --git a/ccx_2.17/src/ccx_2.17.c b/ccx_2.17/src/ccx_2.17.c
+index 8f5ce61..7933c90 100644
+--- a/ccx_2.17/src/ccx_2.17.c
++++ b/ccx_2.17/src/ccx_2.17.c
+@@ -28,6 +28,7 @@ _set_output_format(_TWO_DIGIT_EXPONENT);
+ #include <stdio.h>
+ #include <string.h>
+ #include "CalculiX.h"
++#include <time.h>
+ 
+ #ifdef CALCULIX_MPI
+ ITG myid = 0,nproc = 0;
