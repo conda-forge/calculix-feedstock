@@ -1,56 +1,56 @@
-commit e71707faeb7798f681bef249bdff3cc9772cb0a1
-Author: looooo <sppedflyer@gmail.com>
-Date:   Sun Aug 2 09:30:29 2020 +0200
-
-    clock_gettime.patch
-
 diff --git a/ccx_2.17/src/CalculiXstep.c b/ccx_2.17/src/CalculiXstep.c
-index a797bd2..025c4ee 100644
+index a797bd2..561267e 100644
 --- a/ccx_2.17/src/CalculiXstep.c
 +++ b/ccx_2.17/src/CalculiXstep.c
-@@ -30,7 +30,7 @@
+@@ -25,12 +25,14 @@
+ #include <stdio.h>
+ #include <string.h>
+ #include "CalculiX.h"
++#include <time.h>
+ 
+ #ifdef CALCULIX_MPI
  ITG myid = 0,nproc = 0;
  #endif
  
 -struct timespec totalCalculixTimeStart,totalCalculixTimeEnd; 
-+// struct timespec totalCalculixTimeStart,totalCalculixTimeEnd; 
++
++clock_t totalCalculixTimeStart, totalCalculixTimeEnd, totalCalculixTime;
  
  void CalculiXstep(int argc,char argv[][133],ITG **nelemloadp,double **xloadp,
  		  ITG *nload,char **sideloadp,double *timepar,ITG *ne,
-@@ -256,7 +256,7 @@ void CalculiXstep(int argc,char argv[][133],ITG **nelemloadp,double **xloadp,
+@@ -255,8 +257,7 @@ void CalculiXstep(int argc,char argv[][133],ITG **nelemloadp,double **xloadp,
+ 
      // end change DLR
  
-    
+-   
 -    clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeStart);
-+    // clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeStart);
++    totalCalculixTimeStart = clock()
  
      if(argc==1){printf("Usage: CalculiX.exe -i jobname\n");FORTRAN(stop,());}
      else{
-@@ -2022,16 +2022,16 @@ void CalculiXstep(int argc,char argv[][133],ITG **nelemloadp,double **xloadp,
+@@ -2021,16 +2022,13 @@ void CalculiXstep(int argc,char argv[][133],ITG **nelemloadp,double **xloadp,
+ #ifdef CALCULIX_EXTERNAL_BEHAVIOURS_SUPPORT
    calculix_freeExternalBehaviours();
  #endif /* CALCULIX_EXTERNAL_BEHAVIOURS_SUPPORT */
++  totalCalculixTimeEnd = clock()
++  totalCalculixTime = totalCalculixTimeEnd - totalCalculixTimeStart;
  
 -  clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeEnd); 
-+  // clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeEnd); 
++  double totalCalculixTimeInSeconds = totalCalculixTime / CLOCKS_PER_SEC;
  
 -  totalCalculixTime = (totalCalculixTimeEnd.tv_sec - totalCalculixTimeStart.tv_sec) * 1e9; 
 -  totalCalculixTime = (totalCalculixTime + (totalCalculixTimeEnd.tv_nsec - totalCalculixTimeStart.tv_nsec)) * 1e-9;
-+  // totalCalculixTime = (totalCalculixTimeEnd.tv_sec - totalCalculixTimeStart.tv_sec) * 1e9; 
-+  // totalCalculixTime = (totalCalculixTime + (totalCalculixTimeEnd.tv_nsec - totalCalculixTimeStart.tv_nsec)) * 1e-9;
-   
--  printf("________________________________________\n\n");
-+  // printf("________________________________________\n\n");
-   
+-  
+   printf("________________________________________\n\n");
+-  
 -  printf("Total CalculiX Time: %lf\n", totalCalculixTime);
-+  // printf("Total CalculiX Time: %lf\n", totalCalculixTime);
- 
--  printf("________________________________________\n");
-+  // printf("________________________________________\n");
+-
++  printf("Total CalculiX Time:  %d seconds", totalCalculixTimeInSeconds);
+   printf("________________________________________\n");
  
    return;
-       
 diff --git a/ccx_2.17/src/ccx_2.17.c b/ccx_2.17/src/ccx_2.17.c
-index d1e6aa1..aede1b0 100644
+index d1e6aa1..8ccfbd4 100644
 --- a/ccx_2.17/src/ccx_2.17.c
 +++ b/ccx_2.17/src/ccx_2.17.c
 @@ -34,7 +34,7 @@
@@ -58,7 +58,7 @@ index d1e6aa1..aede1b0 100644
  #endif
  
 -struct timespec totalCalculixTimeStart,totalCalculixTimeEnd; 
-+// struct timespec totalCalculixTimeStart,totalCalculixTimeEnd; 
++clock_t totalCalculixTimeStart, totalCalculixTimeEnd, totalCalculixTime; 
  
  int main(int argc,char *argv[])
  {
@@ -67,30 +67,28 @@ index d1e6aa1..aede1b0 100644
  #endif
  
 -  clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeStart);
-+  // clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeStart);
++  totalCalculixTimeStart = clock()
  
    if(argc==1){printf("Usage: CalculiX.exe -i jobname\n");FORTRAN(stop,());}
    else{
-@@ -1853,16 +1853,16 @@ int main(int argc,char *argv[])
+@@ -1853,15 +1853,13 @@ int main(int argc,char *argv[])
    calculix_freeExternalBehaviours();
  #endif /* CALCULIX_EXTERNAL_BEHAVIOURS_SUPPORT */
  
 -  clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeEnd); 
-+  // clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeEnd); 
++  totalCalculixTimeEnd = clock()
++  totalCalculixTime = totalCalculixTimeEnd - totalCalculixTimeStart;
  
 -  totalCalculixTime = (totalCalculixTimeEnd.tv_sec - totalCalculixTimeStart.tv_sec) * 1e9; 
 -  totalCalculixTime = (totalCalculixTime + (totalCalculixTimeEnd.tv_nsec - totalCalculixTimeStart.tv_nsec)) * 1e-9;
-+  // totalCalculixTime = (totalCalculixTimeEnd.tv_sec - totalCalculixTimeStart.tv_sec) * 1e9; 
-+  // totalCalculixTime = (totalCalculixTime + (totalCalculixTimeEnd.tv_nsec - totalCalculixTimeStart.tv_nsec)) * 1e-9;
-   
+-  
 -  printf("________________________________________\n\n");
-+  // printf("________________________________________\n\n");
-   
+-  
 -  printf("Total CalculiX Time: %lf\n", totalCalculixTime);
-+  // printf("Total CalculiX Time: %lf\n", totalCalculixTime);
++  double totalCalculixTimeInSeconds = totalCalculixTime / CLOCKS_PER_SEC;
  
--  printf("________________________________________\n");
-+  // printf("________________________________________\n");
++  printf("________________________________________\n\n");
++  printf("Total CalculiX Time:  %d seconds", totalCalculixTimeInSeconds);
+   printf("________________________________________\n");
  
    return 0;
-       
