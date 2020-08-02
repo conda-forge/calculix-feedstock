@@ -1,8 +1,14 @@
+commit e71707faeb7798f681bef249bdff3cc9772cb0a1
+Author: looooo <sppedflyer@gmail.com>
+Date:   Sun Aug 2 09:30:29 2020 +0200
+
+    clock_gettime.patch
+
 diff --git a/ccx_2.17/src/CalculiXstep.c b/ccx_2.17/src/CalculiXstep.c
-index 8e83d3e..82535a3 100644
+index a797bd2..025c4ee 100644
 --- a/ccx_2.17/src/CalculiXstep.c
 +++ b/ccx_2.17/src/CalculiXstep.c
-@@ -33,7 +33,7 @@ _set_output_format(_TWO_DIGIT_EXPONENT);
+@@ -30,7 +30,7 @@
  ITG myid = 0,nproc = 0;
  #endif
  
@@ -11,7 +17,7 @@ index 8e83d3e..82535a3 100644
  
  void CalculiXstep(int argc,char argv[][133],ITG **nelemloadp,double **xloadp,
  		  ITG *nload,char **sideloadp,double *timepar,ITG *ne,
-@@ -257,7 +257,7 @@ void CalculiXstep(int argc,char argv[][133],ITG **nelemloadp,double **xloadp,
+@@ -256,7 +256,7 @@ void CalculiXstep(int argc,char argv[][133],ITG **nelemloadp,double **xloadp,
      // end change DLR
  
     
@@ -20,7 +26,7 @@ index 8e83d3e..82535a3 100644
  
      if(argc==1){printf("Usage: CalculiX.exe -i jobname\n");FORTRAN(stop,());}
      else{
-@@ -2023,16 +2023,16 @@ void CalculiXstep(int argc,char argv[][133],ITG **nelemloadp,double **xloadp,
+@@ -2022,16 +2022,16 @@ void CalculiXstep(int argc,char argv[][133],ITG **nelemloadp,double **xloadp,
    calculix_freeExternalBehaviours();
  #endif /* CALCULIX_EXTERNAL_BEHAVIOURS_SUPPORT */
  
