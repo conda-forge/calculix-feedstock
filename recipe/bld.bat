@@ -1,7 +1,7 @@
 cd ccx*/src
-DEL Makefile_MT
-COPY %RECIPE_DIR%\Makefile_MT Makefile_MT
-COPY %BUILD_PREFIX%\Library\mingw-w64\bin\mingw32-make %BUILD_PREFIX%\Library\mingw-w64\bin\make
+rm Makefile_MT
+cp %RECIPE_DIR%\Makefile_MT Makefile_MT
+cp %BUILD_PREFIX%\Library\mingw-w64\bin\mingw32-make %BUILD_PREFIX%\Library\mingw-w64\bin\make
 
 
 REM this line translates the windows-paths to paths understandable for the mingw env
@@ -11,10 +11,10 @@ FOR /F "delims=\" %%i IN ('cygpath.exe -m "%LIBRARY_PREFIX%"') DO set "LIBRARY_P
 make -f Makefile_MT ^
     SPOOLES_INCLUDE_DIR="%LIBRARY_PREFIX%/mingw-w64/include/spooles" ^
     LIB_DIR="%LIBRARY_PREFIX%/mingw-w64/lib" ^
-    LDFLAGS="-L%LIBRARY_PREFIX%/mingw-w64/lib -L%LIBRARY_PREFIX%/lib -lrt" ^
+    LDFLAGS="-L%LIBRARY_PREFIX%/mingw-w64/lib -L%LIBRARY_PREFIX%/lib"^
     FC="gfortran" ^
     VERSION="%PKG_VERSION%"
 
 REM adding .exe to make the file executable
-COPY ccx_*_MT "%LIBRARY_PREFIX%/bin/ccx.exe"
+cp ccx_*_MT "%LIBRARY_PREFIX%/bin/ccx.exe"
 cd %SRC_DIR%
