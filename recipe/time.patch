@@ -24,7 +24,7 @@ index a797bd2..561267e 100644
  
 -   
 -    clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeStart);
-+    totalCalculixTimeStart = clock()
++    totalCalculixTimeStart = clock();
  
      if(argc==1){printf("Usage: CalculiX.exe -i jobname\n");FORTRAN(stop,());}
      else{
@@ -32,7 +32,7 @@ index a797bd2..561267e 100644
  #ifdef CALCULIX_EXTERNAL_BEHAVIOURS_SUPPORT
    calculix_freeExternalBehaviours();
  #endif /* CALCULIX_EXTERNAL_BEHAVIOURS_SUPPORT */
-+  totalCalculixTimeEnd = clock()
++  totalCalculixTimeEnd = clock();
 +  totalCalculixTime = totalCalculixTimeEnd - totalCalculixTimeStart;
  
 -  clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeEnd); 
@@ -67,7 +67,7 @@ index d1e6aa1..8ccfbd4 100644
  #endif
  
 -  clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeStart);
-+  totalCalculixTimeStart = clock()
++  totalCalculixTimeStart = clock();
  
    if(argc==1){printf("Usage: CalculiX.exe -i jobname\n");FORTRAN(stop,());}
    else{
@@ -76,7 +76,7 @@ index d1e6aa1..8ccfbd4 100644
  #endif /* CALCULIX_EXTERNAL_BEHAVIOURS_SUPPORT */
  
 -  clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeEnd); 
-+  totalCalculixTimeEnd = clock()
++  totalCalculixTimeEnd = clock();
 +  totalCalculixTime = totalCalculixTimeEnd - totalCalculixTimeStart;
  
 -  totalCalculixTime = (totalCalculixTimeEnd.tv_sec - totalCalculixTimeStart.tv_sec) * 1e9; 
