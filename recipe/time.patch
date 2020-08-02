@@ -45,7 +45,7 @@ index a797bd2..561267e 100644
 -  
 -  printf("Total CalculiX Time: %lf\n", totalCalculixTime);
 -
-+  printf("Total CalculiX Time:  %d seconds", totalCalculixTimeInSeconds);
++  printf("Total CalculiX Time:  %e seconds", totalCalculixTimeInSeconds);
    printf("________________________________________\n");
  
    return;
@@ -88,7 +88,7 @@ index d1e6aa1..8ccfbd4 100644
 +  double totalCalculixTimeInSeconds = totalCalculixTime / CLOCKS_PER_SEC;
  
 +  printf("________________________________________\n\n");
-+  printf("Total CalculiX Time:  %d seconds", totalCalculixTimeInSeconds);
++  printf("Total CalculiX Time:  %e seconds", totalCalculixTimeInSeconds);
    printf("________________________________________\n");
  
    return 0;
