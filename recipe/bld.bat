@@ -16,5 +16,5 @@ make -f Makefile_MT ^
     VERSION="%PKG_VERSION%"
 
 REM adding .exe to make the file executable
-XCOPY ccx_*_MT "%LIBRARY_PREFIX%\bin\ccx.exe*" \Y
+XCOPY ccx_*_MT "%LIBRARY_PREFIX%\bin\ccx.exe*" /Y
 cd %SRC_DIR%
