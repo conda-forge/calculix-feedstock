@@ -1,30 +1,58 @@
-diff --git a/ccx_2.16/src/ccx_2.16.c b/ccx_2.16/src/ccx_2.16.c
-index 3ab1cb5..4a755c0 100644
---- a/ccx_2.16/src/ccx_2.16.c
-+++ b/ccx_2.16/src/ccx_2.16.c
+commit 743b641fc30f7a606fd508ae46d3119487e761f1
+Author: looooo <sppedflyer@gmail.com>
+Date:   Sat Aug 1 16:25:59 2020 +0200
+
+    mingw.patch
+
+diff --git a/ccx_2.17/src/CalculiXstep.c b/ccx_2.17/src/CalculiXstep.c
+index 8e83d3e..a797bd2 100644
+--- a/ccx_2.17/src/CalculiXstep.c
++++ b/ccx_2.17/src/CalculiXstep.c
+@@ -15,9 +15,6 @@
+ /*     along with this program; if not, write to the Free Software       */
+ /*     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.         */
+ 
+-#ifdef __WIN32
+-_set_output_format(_TWO_DIGIT_EXPONENT);
+-#endif
+ 
+ #ifdef CALCULIX_MPI
+ #include <spoolesMPI.h>
+@@ -44,7 +41,9 @@ void CalculiXstep(int argc,char argv[][133],ITG **nelemloadp,double **xloadp,
+                   ITG *inputsteps,ITG *iperturb,ITG *irstrt,char **filabp,
+                   ITG *nlabel)
+ {
+-
++  #ifdef __WIN32
++  _set_output_format(_TWO_DIGIT_EXPONENT);
++  #endif
+   /* in FORTRAN convention:
+ 
+      nelemload(1,i) (ITG): element for loading i
+diff --git a/ccx_2.17/src/ccx_2.17.c b/ccx_2.17/src/ccx_2.17.c
+index 7933c90..d1e6aa1 100644
+--- a/ccx_2.17/src/ccx_2.17.c
++++ b/ccx_2.17/src/ccx_2.17.c
 @@ -15,9 +15,9 @@
  /*     along with this program; if not, write to the Free Software       */
  /*     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.         */
-
+ 
 -#ifdef __WIN32
--  _set_output_format(_TWO_DIGIT_EXPONENT);
+-_set_output_format(_TWO_DIGIT_EXPONENT);
 -#endif
-+//#ifdef __WIN32
-+//  _set_output_format(_TWO_DIGIT_EXPONENT);
-+//#endif
-
++// #ifdef __WIN32
++// _set_output_format(_TWO_DIGIT_EXPONENT);
++// #endif
+ 
  #ifdef CALCULIX_MPI
  #include <spoolesMPI.h>
-@@ -35,7 +35,11 @@ ITG myid = 0, nproc = 0;
-
+@@ -38,6 +38,9 @@ struct timespec totalCalculixTimeStart,totalCalculixTimeEnd;
+ 
  int main(int argc,char *argv[])
  {
--
-+
-+#ifdef __WIN32
++  #ifdef __WIN32
 +  _set_output_format(_TWO_DIGIT_EXPONENT);
-+#endif
-+
- FILE *f1;
-
- char *sideload=NULL, *set=NULL, *matname=NULL, *orname=NULL, *amname=NULL,
++  #endif
+   
+   FILE *f1;
+     

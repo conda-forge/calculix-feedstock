@@ -5,7 +5,7 @@ Home: http://www.dhondt.de/
 
 Package license: GPL 2
 
-Feedstock license: BSD 3-Clause
+Feedstock license: BSD-3-Clause
 
 Summary: 3D Structural Finite Element Program
 
