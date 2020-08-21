@@ -16,5 +16,5 @@ make -f Makefile_MT ^
     VERSION="%PKG_VERSION%"
 
 rem adding .exe to make the file executable
-copy ccx_*_MT "%LIBRARY_PREFIX%\bin\ccx.exe"
+move ccx_*_MT "%LIBRARY_PREFIX%\bin\ccx.exe"
 cd %SRC_DIR%
