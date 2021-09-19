@@ -1,6 +1,6 @@
 {% set name = "calculix" %}
-{% set version = "2.17" %}
-{% set sha256 = "ca708ad4aa729d9f84a9faba343c1bcc0b7cc84ed372616ebb55c8e6fa8f6e50" %}
+{% set version = "2.18" %}
+{% set sha256 = "fad533bd66693daa398856262bf7c6feb12599c3051955238b0a70420852ff65" %}
 
 
 package:
@@ -16,7 +16,7 @@ source:
     - mingw.patch  # [win]
 
 build:
-  number: 2
+  number: 0
 
 requirements:
   build:
