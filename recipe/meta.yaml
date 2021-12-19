@@ -12,7 +12,7 @@ source:
   url: http://www.dhondt.de/ccx_{{ version }}.src.tar.bz2
   sha256: {{ sha256 }}
   patches:
-    - time.patch  # [win or osx]
+    # - time.patch  # [win or osx]
     - mingw.patch  # [win]
 
 build:
