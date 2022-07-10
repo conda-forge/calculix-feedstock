@@ -13,7 +13,7 @@ source:
   sha256: {{ sha256 }}
   patches:
     - time.patch  # [win or osx]
-    # - mingw.patch  # [win]
+    - mingw.patch  # [win]
 
 build:
   number: 0
