@@ -1,0 +1,54 @@
+diff --git a/ccx_2.20/src/CalculiXstep.c b/ccx_2.20/src/CalculiXstep.c
+index e12e32f..534c4d7 100644
+--- a/ccx_2.20/src/CalculiXstep.c
++++ b/ccx_2.20/src/CalculiXstep.c
+@@ -15,9 +15,6 @@
+ /*     along with this program; if not, write to the Free Software       */
+ /*     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.         */
+ 
+-#ifdef __WIN32
+-_set_output_format(_TWO_DIGIT_EXPONENT);
+-#endif
+ 
+ #ifdef CALCULIX_MPI
+ #include <spoolesMPI.h>
+@@ -45,6 +42,10 @@ void CalculiXstep(int argc,char argv[][133],ITG **nelemloadp,double **xloadp,
+                   ITG *nlabel)
+ {
+ 
++#ifdef __WIN32
++_set_output_format(_TWO_DIGIT_EXPONENT);
++#endif
++
+   /* in FORTRAN convention:
+ 
+      nelemload(1,i) (ITG): element for loading i
+diff --git a/ccx_2.20/src/ccx_2.20.c b/ccx_2.20/src/ccx_2.20.c
+index ca20e40..dd35f99 100644
+--- a/ccx_2.20/src/ccx_2.20.c
++++ b/ccx_2.20/src/ccx_2.20.c
+@@ -15,10 +15,6 @@
+ /*     along with this program; if not, write to the Free Software       */
+ /*     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.         */
+ 
+-#ifdef __WIN32
+-_set_output_format(_TWO_DIGIT_EXPONENT);
+-#endif
+-
+ #ifdef CALCULIX_MPI
+ #include <spoolesMPI.h>
+ #endif
+@@ -37,7 +33,12 @@ struct timespec totalCalculixTimeStart,totalCalculixTimeEnd;
+ 
+ int main(int argc,char *argv[])
+ {
+-  
++
++
++#ifdef __WIN32
++_set_output_format(_TWO_DIGIT_EXPONENT);
++#endif
++
+   FILE *f1;
+     
+   char *sideload=NULL,*set=NULL,*matname=NULL,*orname=NULL,*amname=NULL,
