@@ -1,0 +1,72 @@
+diff --git a/ccx_2.20/src/CalculiXstep.c b/ccx_2.20/src/CalculiXstep.c
+index 534c4d7..0c8a58c 100644
+--- a/ccx_2.20/src/CalculiXstep.c
++++ b/ccx_2.20/src/CalculiXstep.c
+@@ -260,7 +260,7 @@ _set_output_format(_TWO_DIGIT_EXPONENT);
+     // end change DLR
+ 
+    
+-    clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeStart);
++    // clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeStart);
+ 
+     if(argc==1){printf("Usage: CalculiX.exe -i jobname\n");FORTRAN(stop,());}
+     else{
+@@ -2044,16 +2044,16 @@ _set_output_format(_TWO_DIGIT_EXPONENT);
+   calculix_freeExternalBehaviours();
+ #endif /* CALCULIX_EXTERNAL_BEHAVIOURS_SUPPORT */
+ 
+-  clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeEnd); 
++  // clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeEnd); 
+ 
+-  totalCalculixTime = (totalCalculixTimeEnd.tv_sec - totalCalculixTimeStart.tv_sec) * 1e9; 
+-  totalCalculixTime = (totalCalculixTime + (totalCalculixTimeEnd.tv_nsec - totalCalculixTimeStart.tv_nsec)) * 1e-9;
++  // totalCalculixTime = (totalCalculixTimeEnd.tv_sec - totalCalculixTimeStart.tv_sec) * 1e9; 
++  // totalCalculixTime = (totalCalculixTime + (totalCalculixTimeEnd.tv_nsec - totalCalculixTimeStart.tv_nsec)) * 1e-9;
+   
+-  printf("________________________________________\n\n");
++  // printf("________________________________________\n\n");
+   
+-  printf("Total CalculiX Time: %lf\n", totalCalculixTime);
++  // printf("Total CalculiX Time: %lf\n", totalCalculixTime);
+ 
+-  printf("________________________________________\n");
++  // printf("________________________________________\n");
+ 
+   return;
+       
+diff --git a/ccx_2.20/src/ccx_2.20.c b/ccx_2.20/src/ccx_2.20.c
+index dd35f99..739ddff 100644
+--- a/ccx_2.20/src/ccx_2.20.c
++++ b/ccx_2.20/src/ccx_2.20.c
+@@ -113,7 +113,7 @@ _set_output_format(_TWO_DIGIT_EXPONENT);
+   MPI_Comm_size(MPI_COMM_WORLD, &nproc) ;
+ #endif
+ 
+-  clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeStart);
++  // clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeStart);
+ 
+   if(argc==1){printf("Usage: CalculiX.exe -i jobname\n");FORTRAN(stop,());}
+   else{
+@@ -1876,16 +1876,16 @@ _set_output_format(_TWO_DIGIT_EXPONENT);
+   calculix_freeExternalBehaviours();
+ #endif /* CALCULIX_EXTERNAL_BEHAVIOURS_SUPPORT */
+ 
+-  clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeEnd); 
++  // clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeEnd); 
+ 
+-  totalCalculixTime = (totalCalculixTimeEnd.tv_sec - totalCalculixTimeStart.tv_sec) * 1e9; 
+-  totalCalculixTime = (totalCalculixTime + (totalCalculixTimeEnd.tv_nsec - totalCalculixTimeStart.tv_nsec)) * 1e-9;
++  // totalCalculixTime = (totalCalculixTimeEnd.tv_sec - totalCalculixTimeStart.tv_sec) * 1e9; 
++  // totalCalculixTime = (totalCalculixTime + (totalCalculixTimeEnd.tv_nsec - totalCalculixTimeStart.tv_nsec)) * 1e-9;
+   
+-  printf("________________________________________\n\n");
++  // printf("________________________________________\n\n");
+   
+-  printf("Total CalculiX Time: %lf\n", totalCalculixTime);
++  // printf("Total CalculiX Time: %lf\n", totalCalculixTime);
+ 
+-  printf("________________________________________\n");
++  // printf("________________________________________\n");
+ 
+   return 0;
+       
