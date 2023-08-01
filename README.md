@@ -1,17 +1,17 @@
-About calculix
-==============
+About calculix-feedstock
+========================
+
+Feedstock license: [BSD-3-Clause](https://github.com/conda-forge/calculix-feedstock/blob/main/LICENSE.txt)
 
 Home: http://www.dhondt.de/
 
 Package license: GPL-2.0-or-later
 
-Feedstock license: [BSD-3-Clause](https://github.com/conda-forge/calculix-feedstock/blob/main/LICENSE.txt)
-
 Summary: 3D Structural Finite Element Program
 
 Development: http://www.dhondt.de/
 
-Documentation: http://www.dhondt.de/ccx_2.20.pdf
+Documentation: http://www.dhondt.de/ccx_2.21.pdf
 
 A Free Software Three-Dimensional Structural Finite Element Program
 
