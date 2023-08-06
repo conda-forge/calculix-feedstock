@@ -55,10 +55,31 @@ index 7b5d5cc..c6112b5 100644
    return 0;
        
 diff --git a/ccx_2.21/src/ccx_2.21step.c b/ccx_2.21/src/ccx_2.21step.c
-index 1ff4bbc..f2a7897 100644
+index 1ff4bbc..9921fd3 100644
 --- a/ccx_2.21/src/ccx_2.21step.c
 +++ b/ccx_2.21/src/ccx_2.21step.c
-@@ -259,7 +259,7 @@ void CalculiXstep(int argc,char argv[][133],ITG **nelemloadp,double **xloadp,
+@@ -15,9 +15,6 @@
+ /*     along with this program; if not, write to the Free Software       */
+ /*     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.         */
+ 
+-#ifdef __WIN32
+-_set_output_format(_TWO_DIGIT_EXPONENT);
+-#endif
+ 
+ #ifdef CALCULIX_MPI
+ #include <spoolesMPI.h>
+@@ -44,7 +41,9 @@ void CalculiXstep(int argc,char argv[][133],ITG **nelemloadp,double **xloadp,
+                   ITG *inputsteps,ITG *iperturb,ITG *irstrt,char **filabp,
+                   ITG *nlabel)
+ {
+-
++#ifdef __WIN32
++_set_output_format(_TWO_DIGIT_EXPONENT);
++#endif
+   /* in FORTRAN convention:
+ 
+      nelemload(1,i) (ITG): element for loading i
+@@ -259,7 +258,7 @@ void CalculiXstep(int argc,char argv[][133],ITG **nelemloadp,double **xloadp,
      // end change DLR
  
     
@@ -67,7 +88,7 @@ index 1ff4bbc..f2a7897 100644
  
      if(argc==1){printf("Usage: CalculiX.exe -i jobname\n");FORTRAN(stop,());}
      else{
-@@ -2055,16 +2055,16 @@ void CalculiXstep(int argc,char argv[][133],ITG **nelemloadp,double **xloadp,
+@@ -2055,16 +2054,16 @@ void CalculiXstep(int argc,char argv[][133],ITG **nelemloadp,double **xloadp,
    calculix_freeExternalBehaviours();
  #endif /* CALCULIX_EXTERNAL_BEHAVIOURS_SUPPORT */
  
