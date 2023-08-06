@@ -1,0 +1,56 @@
+diff --git a/ccx_2.21/src/ccx_2.21.c b/ccx_2.21/src/ccx_2.21.c
+index 7b5d5cc..c6112b5 100644
+--- a/ccx_2.21/src/ccx_2.21.c
++++ b/ccx_2.21/src/ccx_2.21.c
+@@ -15,9 +15,6 @@
+ /*     along with this program; if not, write to the Free Software       */
+ /*     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.         */
+ 
+-#ifdef __WIN32
+-_set_output_format(_TWO_DIGIT_EXPONENT);
+-#endif
+ 
+ #ifdef CALCULIX_MPI
+ #include <spoolesMPI.h>
+@@ -37,6 +34,9 @@ struct timespec totalCalculixTimeStart,totalCalculixTimeEnd;
+ 
+ int main(int argc,char *argv[])
+ {
++#ifdef __WIN32
++  _set_output_format(_TWO_DIGIT_EXPONENT);
++#endif
+   
+   FILE *f1;
+     
+@@ -112,7 +112,7 @@ int main(int argc,char *argv[])
+   MPI_Comm_size(MPI_COMM_WORLD, &nproc) ;
+ #endif
+ 
+-  clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeStart);
++  // clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeStart);
+ 
+   if(argc==1){printf("Usage: CalculiX.exe -i jobname\n");FORTRAN(stop,());}
+   else{
+@@ -1907,16 +1907,16 @@ int main(int argc,char *argv[])
+   calculix_freeExternalBehaviours();
+ #endif /* CALCULIX_EXTERNAL_BEHAVIOURS_SUPPORT */
+ 
+-  clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeEnd); 
++  // clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeEnd); 
+ 
+-  totalCalculixTime = (totalCalculixTimeEnd.tv_sec - totalCalculixTimeStart.tv_sec) * 1e9; 
+-  totalCalculixTime = (totalCalculixTime + (totalCalculixTimeEnd.tv_nsec - totalCalculixTimeStart.tv_nsec)) * 1e-9;
++  // totalCalculixTime = (totalCalculixTimeEnd.tv_sec - totalCalculixTimeStart.tv_sec) * 1e9; 
++  // totalCalculixTime = (totalCalculixTime + (totalCalculixTimeEnd.tv_nsec - totalCalculixTimeStart.tv_nsec)) * 1e-9;
+   
+-  printf("________________________________________\n\n");
++  // printf("________________________________________\n\n");
+   
+-  printf("Total CalculiX Time: %lf\n", totalCalculixTime);
++  // printf("Total CalculiX Time: %lf\n", totalCalculixTime);
+ 
+-  printf("________________________________________\n");
++  // printf("________________________________________\n");
+ 
+   return 0;
+       
