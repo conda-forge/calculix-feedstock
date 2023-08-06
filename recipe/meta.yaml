@@ -14,7 +14,7 @@ source:
   patches:
     # - patches/mingw.patch  # [win or osx]
     # - patches/time.patch  # [win or osx]
-    - mingw_time.patch  # [win or osx]
+    - patches/mingw_time.patch  # [win or osx]
 
 build:
   number: 0
