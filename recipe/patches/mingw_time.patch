@@ -54,3 +54,39 @@ index 7b5d5cc..c6112b5 100644
  
    return 0;
        
+diff --git a/ccx_2.21/src/ccx_2.21step.c b/ccx_2.21/src/ccx_2.21step.c
+index 1ff4bbc..f2a7897 100644
+--- a/ccx_2.21/src/ccx_2.21step.c
++++ b/ccx_2.21/src/ccx_2.21step.c
+@@ -259,7 +259,7 @@ void CalculiXstep(int argc,char argv[][133],ITG **nelemloadp,double **xloadp,
+     // end change DLR
+ 
+    
+-    clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeStart);
++    // clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeStart);
+ 
+     if(argc==1){printf("Usage: CalculiX.exe -i jobname\n");FORTRAN(stop,());}
+     else{
+@@ -2055,16 +2055,16 @@ void CalculiXstep(int argc,char argv[][133],ITG **nelemloadp,double **xloadp,
+   calculix_freeExternalBehaviours();
+ #endif /* CALCULIX_EXTERNAL_BEHAVIOURS_SUPPORT */
+ 
+-  clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeEnd); 
++  // clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeEnd); 
+ 
+-  totalCalculixTime = (totalCalculixTimeEnd.tv_sec - totalCalculixTimeStart.tv_sec) * 1e9; 
+-  totalCalculixTime = (totalCalculixTime + (totalCalculixTimeEnd.tv_nsec - totalCalculixTimeStart.tv_nsec)) * 1e-9;
++  // totalCalculixTime = (totalCalculixTimeEnd.tv_sec - totalCalculixTimeStart.tv_sec) * 1e9; 
++  // totalCalculixTime = (totalCalculixTime + (totalCalculixTimeEnd.tv_nsec - totalCalculixTimeStart.tv_nsec)) * 1e-9;
+   
+-  printf("________________________________________\n\n");
++  // printf("________________________________________\n\n");
+   
+-  printf("Total CalculiX Time: %lf\n", totalCalculixTime);
++  // printf("Total CalculiX Time: %lf\n", totalCalculixTime);
+ 
+-  printf("________________________________________\n");
++  // printf("________________________________________\n");
+ 
+   return;
+       
