@@ -19,5 +19,5 @@ make -f Makefile_MT \
     VERSION="${PKG_VERSION}" -j${CPU_COUNT}
 
 mkdir -p ${PREFIX}/bin
-cp ccx_*_MT ${PREFIX}/bin/ccx
+cp ccx_*_conda ${PREFIX}/bin/ccx
 cd $SRC_DIR

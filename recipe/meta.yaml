@@ -17,7 +17,7 @@ source:
     - patches/mingw_time.patch  # [win or osx]
 
 build:
-  number: 2
+  number: 3
 
 requirements:
   build:
