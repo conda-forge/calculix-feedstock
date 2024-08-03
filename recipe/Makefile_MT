@@ -1,7 +1,7 @@
 AR ?= ar
 FC ?= gfortran
 CC ?= gcc
-CFLAGS += -Wall -O3 -fopenmp -I $(SPOOLES_INCLUDE_DIR) -DARCH="Linux" -DSPOOLES -DARPACK -DMATRIXSTORAGE -DUSE_MT=1
+CFLAGS += -Wall -O3 -fopenmp -I $(SPOOLES_INCLUDE_DIR) -DARCH="Linux" -DSPOOLES -DARPACK -DMATRIXSTORAGE
 FFLAGS += -Wall -O3 -fopenmp
 
 .c.o :
@@ -18,11 +18,10 @@ OCCXC = $(SCCXC:.c=.o)
 OCCXMAIN = $(SCCXMAIN:.c=.o)
 
 LIBS = \
-    $(LIB_DIR)/spoolesMT.a \
     $(LIB_DIR)/spooles.a
 
-ccx_$(VERSION)_MT: $(OCCXMAIN) ccx_$(VERSION)_MT.a
-	./date.pl; $(CC) $(CFLAGS) -c ccx_$(VERSION).c; $(FC) $(FFLAGS) -o $@ $(OCCXMAIN) ccx_$(VERSION)_MT.a $(LDFLAGS) -larpack -llapack -lblas $(LIBS)
+ccx_$(VERSION)_conda: $(OCCXMAIN) ccx_$(VERSION)_conda.a
+	./date.pl; $(CC) $(CFLAGS) -c ccx_$(VERSION).c; $(FC) $(FFLAGS) -o $@ $(OCCXMAIN) ccx_$(VERSION)_conda.a $(LDFLAGS) -larpack -llapack -lblas $(LIBS)
 
-ccx_$(VERSION)_MT.a: $(OCCXF) $(OCCXC)
+ccx_$(VERSION)_conda.a: $(OCCXF) $(OCCXC)
 	$(AR) vr $@ $?
