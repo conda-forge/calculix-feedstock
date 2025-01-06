@@ -25,8 +25,7 @@ requirements:
     - {{ stdlib("m2w64_c") }}    # [win]
     - {{ compiler("fortran") }}  # [unix]
     - {{ compiler('m2w64_fortran') }}  # [win]
-    - m2-make   # [win]
-    - make      # [not win]
+    - make
     - perl
     - llvm-openmp  # [osx]
   host:

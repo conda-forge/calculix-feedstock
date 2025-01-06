@@ -18,7 +18,7 @@ index ae42102..af5236a 100644
  int main(int argc,char *argv[])
  {
 -  
-+#ifdef __WIN32
++#ifdef _MSC_VER
 +_set_output_format(_TWO_DIGIT_EXPONENT);
 +#endif
 +
@@ -76,7 +76,7 @@ index a6aa1c0..e55ed79 100644
                    ITG *inputsteps,ITG *iperturb,ITG *irstrt,char **filabp,
                    ITG *nlabel)
  {
-+#ifdef __WIN32
++#ifdef _MSC_VER
 +_set_output_format(_TWO_DIGIT_EXPONENT);
 +#endif
  
