@@ -8,6 +8,9 @@ rem this line translates the windows-paths to paths understandable for the mingw
 rem -m, --mixed           like --windows, but with regular slashes (C:/WINNT)
 for /F "delims=\" %%i IN ('cygpath.exe -m "%LIBRARY_PREFIX%"') DO set "LIBRARY_PREFIX=%%i"
 
+REM Replace all backslashes with forward slashes
+set "LIBRARY_PREFIX=%LIBRARY_PREFIX:\=/%"
+
 make -f Makefile_MT ^
     SPOOLES_INCLUDE_DIR="%LIBRARY_PREFIX%/include/spooles" ^
     LIB_DIR="%LIBRARY_PREFIX%/lib" ^
