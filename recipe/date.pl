@@ -2,6 +2,8 @@
 use strict;
 use warnings;
 
+my $version = $ENV{'PKG_VERSION'}
+
 # For a human-readable string like "Wed Jan  1 00:00:00 2025"
 my $date = scalar localtime;
 
