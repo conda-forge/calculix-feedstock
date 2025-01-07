@@ -10,14 +10,14 @@ my $date = scalar localtime;
 # my $date = strftime("%Y-%m-%d %H:%M:%S", localtime);
 
 # Now do your file-editing
-@ARGV = ("ccx_$(VERSION).c");
+@ARGV = ("ccx_$(version).c");
 $^I   = ".old";
 while (<>) {
     s/You are using an executable made on.*/You are using an executable made on $date\\n");/;
     print;
 }
 
-@ARGV = ("ccx_$(VERSION)step.c");
+@ARGV = ("ccx_$(version)step.c");
 $^I   = ".old";
 while (<>) {
     s/You are using an executable made on.*/You are using an executable made on $date\\n");/;
@@ -32,6 +32,6 @@ while (<>) {
 }
 
 # Clean up old files
-unlink "CalculiX.c.old";
-unlink "CalculiXstep.c.old";
+unlink "ccx_$(version).c.old";
+unlink "ccx_$(version)step.c.old";
 unlink "frd.c.old";
