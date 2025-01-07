@@ -3,15 +3,15 @@ About calculix-feedstock
 
 Feedstock license: [BSD-3-Clause](https://github.com/conda-forge/calculix-feedstock/blob/main/LICENSE.txt)
 
-Home: http://www.dhondt.de/
+Home: https://www.dhondt.de/
 
 Package license: GPL-2.0-or-later
 
 Summary: 3D Structural Finite Element Program
 
-Development: http://www.dhondt.de/
+Development: https://github.com/Dhondtguido/CalculiX
 
-Documentation: http://www.dhondt.de/ccx_2.22.pdf
+Documentation: https://www.dhondt.de/ccx_2.22.pdf
 
 A Free Software Three-Dimensional Structural Finite Element Program
 
@@ -196,5 +196,6 @@ In order to produce a uniquely identifiable distribution:
 Feedstock Maintainers
 =====================
 
+* [@Krande](https://github.com/Krande/)
 * [@looooo](https://github.com/looooo/)
 
