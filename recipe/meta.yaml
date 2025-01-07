@@ -41,17 +41,17 @@ requirements:
 test:
   commands:
     - test -f ${PREFIX}/bin/ccx  # [unix]
-    - test -f %LIBRARY_PREFIX%\bin\ccx.exe  # [win]
+    - if not exist %LIBRARY_PREFIX%\bin\ccx.exe exit 1  # [win]
 
 about:
-  home: http://www.dhondt.de/
+  home: https://www.dhondt.de/
   license: GPL-2.0-or-later
   license_family: GPL
   license_file: {{ environ["RECIPE_DIR"] }}/LICENSE
   summary: 3D Structural Finite Element Program
   description: A Free Software Three-Dimensional Structural Finite Element Program
-  doc_url: http://www.dhondt.de/ccx_{{ version }}.pdf
-  dev_url: http://www.dhondt.de/
+  doc_url: https://www.dhondt.de/ccx_{{ version }}.pdf
+  dev_url: https://github.com/Dhondtguido/CalculiX
 
 extra:
   recipe-maintainers:
