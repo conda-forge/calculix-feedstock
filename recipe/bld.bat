@@ -6,6 +6,7 @@ copy %RECIPE_DIR%\date.pl date.pl
 
 rem this line translates the windows-paths to paths understandable for the mingw env
 rem -m, --mixed           like --windows, but with regular slashes (C:/WINNT)
+for /F "delims=\" %%i IN ('cygpath.exe -m "%LIBRARY_PREFIX%"') DO set "LIBRARY_PREFIX=%%i"
 
 make -f Makefile_MT ^
     SPOOLES_INCLUDE_DIR="%LIBRARY_PREFIX%/include/spooles" ^
