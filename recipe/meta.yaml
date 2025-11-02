@@ -1,6 +1,6 @@
 {% set name = "calculix" %}
-{% set version = "2.22" %}
-{% set sha256 = "3a94dcc775a31f570229734b341d6b06301ebdc759863df901c8b9bf1854c0bc" %}
+{% set version = "2.23" %}
+{% set sha256 = "9c88385c10fb04f5dc6c4e98027a51bebdd8aee3920e05190d6c1dd08357d6e7" %}
 
 
 package:
@@ -15,7 +15,7 @@ source:
     - patches/mingw_time.patch  # [win or osx]
 
 build:
-  number: 1
+  number: 0
 
 requirements:
   build:
