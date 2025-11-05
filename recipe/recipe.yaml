@@ -59,7 +59,7 @@ tests:
 
 about:
   license: GPL-2.0-or-later
-  license_file: ${{ RECIPE_DIR }}/LICENSE
+  license_file: ${{ env.get("RECIPE_DIR") }}/LICENSE
   summary: 3D Structural Finite Element Program
   description: A Free Software Three-Dimensional Structural Finite Element Program
   homepage: https://www.dhondt.de/

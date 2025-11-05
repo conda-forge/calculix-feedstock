@@ -1,7 +1,7 @@
 cd ccx*/src
 del Makefile_MT
 copy %RECIPE_DIR%\Makefile_MT Makefile_MT
-REM copy %RECIPE_DIR%\date.pl date.pl
+copy "%RECIPE_DIR%\date.pl" date.pl
 
 
 rem this line translates the windows-paths to paths understandable for the mingw env
