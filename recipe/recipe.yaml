@@ -12,7 +12,6 @@ package:
 source:
   url: http://www.dhondt.de/ccx_${{ version }}.src.tar.bz2
   sha256: ${{ sha256 }}
-  file_name: ${{ name }}_${{ version }}.tar.bz2
   patches:
     - if: win or osx
       then: patches/mingw_time.patch
@@ -22,33 +21,34 @@ build:
 
 requirements:
   build:
-    - if: unix
-      then: ${{ compiler("c") }}
-    - if: unix
-      then: ${{ stdlib("c") }}
-    - if: win
-      then: ${{ compiler('m2w64_c') }}
-    - if: win
-      then: ${{ stdlib("m2w64_c") }}
-    - if: unix
-      then: ${{ compiler("fortran") }}
-    - if: win
-      then: ${{ compiler('m2w64_fortran') }}
     - make
     - perl
+    - if: unix
+      then:
+        - ${{ compiler("c") }}
+        - ${{ stdlib("c") }}
+        - ${{ compiler("fortran") }}
+    - if: win
+      then:
+        - ${{ compiler('m2w64_c') }}
+        - ${{ stdlib('m2w64_c') }}
+        - ${{ compiler('m2w64_fortran') }}
     - if: osx
-      then: llvm-openmp
+      then:
+        - llvm-openmp
   host:
     - libblas
     - liblapack
     - arpack
     - spooles
     - if: osx
-      then: llvm-openmp
+      then:
+        - llvm-openmp
   run:
     - arpack
     - if: osx
-      then: llvm-openmp
+      then:
+        - llvm-openmp
 
 tests:
   - script:
