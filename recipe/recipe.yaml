@@ -53,7 +53,7 @@ requirements:
 tests:
   - script:
       - if: unix
-        then: test -f ${PREFIX}/bin/ccx
+        then: test -f $PREFIX/bin/ccx
       - if: win
         then: if not exist %LIBRARY_PREFIX%\bin\ccx.exe exit 1
 
