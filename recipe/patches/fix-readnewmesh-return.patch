@@ -1,0 +1,11 @@
+--- a/ccx_2.23/src/readnewmesh.c
++++ b/ccx_2.23/src/readnewmesh.c
+@@ -465,7 +465,7 @@
+   *iprfnp=iprfn;*konrfnp=konrfn;*ratiorfnp=ratiorfn;
+
+-  return NULL;
++  return;
+
+ }
+
+

@@ -1,0 +1,22 @@
+--- a/ccx_2.23/src/move.f
++++ b/ccx_2.23/src/move.f
+@@ -37,19 +37,14 @@
+ !
+ !     moves a file on disk
+ !
+-#if defined(__INTEL_COMPILER)
+-      use ifport, only: rename
+-#endif
+-!
+       implicit none
+ !
+       character*132 source, target
+       integer iostat
+ !
+-#if defined(__GFORTRAN__) || defined(__INTEL_COMPILER)
+-!     use GNU extension or IFPORT library function
++#if defined(__GFORTRAN__)
++!     use GNU extension rename()
+       iostat = rename(source, target)
+ #else
+ !     fall back to copying and deleting
