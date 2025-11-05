@@ -13,12 +13,10 @@ source:
   url: http://www.dhondt.de/ccx_${{ version }}.src.tar.bz2
   sha256: ${{ sha256 }}
   patches:
+    - patches/avoid-ifport.patch
+    - patches/fix-readnewmesh-return.patch
     - if: win or osx
       then: patches/mingw_time.patch
-    - if: win
-      then:
-        - patches/avoid-ifport.patch
-        - patches/fix-readnewmesh-return.patch
 
 build:
   number: 2
