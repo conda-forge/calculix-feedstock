@@ -1,7 +1,7 @@
-diff --git a/ccx_2.22/src/ccx_2.22.c b/ccx_2.22/src/ccx_2.22.c
+diff --git a/ccx_2.23/src/ccx_2.23.c b/ccx_2.23/src/ccx_2.23.c
 index ae42102..af5236a 100644
---- a/ccx_2.22/src/ccx_2.22.c
-+++ b/ccx_2.22/src/ccx_2.22.c
+--- a/ccx_2.23/src/ccx_2.23.c
++++ b/ccx_2.23/src/ccx_2.23.c
 @@ -15,10 +15,6 @@
  /*     along with this program; if not, write to the Free Software       */
  /*     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.         */
@@ -57,10 +57,10 @@ index ae42102..af5236a 100644
  
    return 0;
        
-diff --git a/ccx_2.22/src/ccx_2.22step.c b/ccx_2.22/src/ccx_2.22step.c
+diff --git a/ccx_2.23/src/ccx_2.23step.c b/ccx_2.23/src/ccx_2.23step.c
 index a6aa1c0..e55ed79 100644
---- a/ccx_2.22/src/ccx_2.22step.c
-+++ b/ccx_2.22/src/ccx_2.22step.c
+--- a/ccx_2.23/src/ccx_2.23step.c
++++ b/ccx_2.23/src/ccx_2.23step.c
 @@ -15,10 +15,6 @@
  /*     along with this program; if not, write to the Free Software       */
  /*     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.         */
