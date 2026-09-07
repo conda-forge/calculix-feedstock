@@ -66,6 +66,20 @@ tests:
         then: test -f $PREFIX/bin/ccx
       - if: win
         then: if not exist %LIBRARY_PREFIX%\bin\ccx.exe exit 1
+  # a build that links but miscomputes has shipped from here before, so
+  # actually solve something and check the numbers
+  - script: python run_test.py
+    files:
+      recipe:
+        - run_test.py
+        - smoketest.inp
+        - contact.inp
+        - contact.dat.ref
+        - mohr.inp
+        - restart.inp
+    requirements:
+      run:
+        - python
 
 about:
   license: GPL-2.0-or-later

@@ -1,0 +1,52 @@
+**
+**   *RESTART,WRITE,OVERLAY over two steps.
+**
+**   The second step has to overwrite the restart file the first one wrote.
+**   move.f does that with rename() under
+**
+**     #if defined(__GFORTRAN__)
+**
+**   and falls back to copy-and-delete otherwise.  Compiled without -cpp,
+**   gfortran only warns about the directives and emits *both* arms, so the
+**   file is renamed and then the copy of the (now gone) source fails with
+**
+**     Error opening source file: 2
+**     *ERROR in restartwrite: temporaryrestartfile cannot be renamed
+**
+*NODE, NSET=Nall
+1,   0.,   0.,   0.
+2, 100.,   0.,   0.
+3, 100., 100.,   0.
+4,   0., 100.,   0.
+5,   0.,   0., 100.
+6, 100.,   0., 100.
+7, 100., 100., 100.
+8,   0., 100., 100.
+*ELEMENT, TYPE=C3D8, ELSET=Eall
+1, 1, 2, 3, 4, 5, 6, 7, 8
+*NSET, NSET=Nfix
+1, 2, 3, 4
+*MATERIAL, NAME=STEEL
+*ELASTIC
+210000., 0.3
+*SOLID SECTION, ELSET=Eall, MATERIAL=STEEL
+*STEP
+*RESTART,WRITE,OVERLAY
+*STATIC
+*BOUNDARY
+Nfix, 3, 3, 0.
+1, 1, 2, 0.
+2, 2, 2, 0.
+*DLOAD
+1, P2, 1.
+*NODE PRINT, NSET=Nall
+U
+*END STEP
+*STEP
+*RESTART,WRITE,OVERLAY
+*STATIC
+*DLOAD
+1, P2, 2.
+*NODE PRINT, NSET=Nall
+U
+*END STEP
