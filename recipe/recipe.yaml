@@ -15,13 +15,19 @@ source:
   patches:
     - patches/avoid-ifport.patch
     - patches/fix-readnewmesh-return.patch
+    # submitted upstream; drop these when they land in a release
+    - patches/upstream-f2f-contact-array-bounds.patch
+    - patches/upstream-frictionless-contact-slip.patch
+    - patches/upstream-nonlinmpc-straight-mpc.patch
+    - patches/upstream-mohrcoulomb-degenerate-return.patch
+    - patches/upstream-readfrd-return-value.patch
     - if: win or osx
       then: patches/mingw_time.patch
     - if: win
       then: patches/fix-win-locale.patch
 
 build:
-  number: 4
+  number: 5
 
 requirements:
   build:
