@@ -21,6 +21,8 @@ source:
     - patches/upstream-nonlinmpc-straight-mpc.patch
     - patches/upstream-mohrcoulomb-degenerate-return.patch
     - patches/upstream-readfrd-return-value.patch
+    - patches/upstream-locale-numeric.patch
+    - patches/upstream-makefile-inc-mafillmm.patch
     - if: win or osx
       then: patches/mingw_time.patch
     - if: win
