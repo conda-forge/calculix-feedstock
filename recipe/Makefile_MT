@@ -47,8 +47,10 @@ OCCXMAIN = $(SCCXMAIN:.c=.o)
 LIBS = \
     $(LIB_DIR)/spooles.a
 
+# date.pl is run by build.sh/build.bat before make, so that frd.c is stamped
+# before it is compiled; nothing to do here but link.
 ccx_$(VERSION)_conda: $(OCCXMAIN) ccx_$(VERSION)_conda.a
-	perl date.pl && $(CC) $(CFLAGS) -c ccx_$(VERSION).c && $(FC) $(FFLAGS) -o $@ $(OCCXMAIN) ccx_$(VERSION)_conda.a $(LDFLAGS) -larpack -llapack -lblas $(LIBS)
+	$(FC) $(FFLAGS) -o $@ $(OCCXMAIN) ccx_$(VERSION)_conda.a $(LDFLAGS) -larpack -llapack -lblas $(LIBS)
 
 ccx_$(VERSION)_conda.a: $(OCCXF) $(OCCXC)
 	$(AR) vr $@ $?

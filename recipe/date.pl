@@ -1,39 +1,32 @@
 #!/usr/bin/env perl
+#
+# Stamps the build date into the sources, like upstream's own date.pl.
+# Must run before the sources are compiled so that frd.c picks the stamp up
+# as well (build.sh/build.bat call it ahead of make).
+#
 use strict;
 use warnings;
 
-my $version = $ENV{'PKG_VERSION'};
+my $version = $ENV{'PKG_VERSION'}
+    or die "date.pl: PKG_VERSION is not set\n";
 
-# For a human-readable string like "Wed Jan  1 00:00:00 2025"
 my $date = scalar localtime;
 
-# Or, for a custom format, you could use the POSIX strftime approach:
-# use POSIX qw(strftime);
-# my $date = strftime("%Y-%m-%d %H:%M:%S", localtime);
-
-# Now do your file-editing
-@ARGV = ("ccx_$(version).c");
-$^I   = ".old";
-while (<>) {
-    s/You are using an executable made on.*/You are using an executable made on $date\\n");/;
-    print;
+sub stamp {
+    my ($file, $pattern, $replacement) = @_;
+    -f $file or die "date.pl: $file not found\n";
+    local @ARGV = ($file);
+    local $^I = '.old';
+    while (<>) {
+        s/$pattern/$replacement/;
+        print;
+    }
+    unlink "$file.old";
 }
 
-@ARGV = ("ccx_$(version)step.c");
-$^I   = ".old";
-while (<>) {
-    s/You are using an executable made on.*/You are using an executable made on $date\\n");/;
-    print;
-}
-
-@ARGV = ("frd.c");
-$^I   = ".old";
-while (<>) {
-    s/COMPILETIME.*/COMPILETIME       $date                    \\n\",p1);/;
-    print;
-}
-
-# Clean up old files
-unlink "ccx_$(version).c.old";
-unlink "ccx_$(version)step.c.old";
-unlink "frd.c.old";
+stamp("ccx_$version.c", qr/You are using an executable made on.*/,
+      "You are using an executable made on $date\\n\");");
+stamp("ccx_${version}step.c", qr/You are using an executable made on.*/,
+      "You are using an executable made on $date\\n\");");
+stamp('frd.c', qr/COMPILETIME.*/,
+      "COMPILETIME       $date                    \\n\",p1);");
