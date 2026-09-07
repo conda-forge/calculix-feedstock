@@ -1,8 +1,35 @@
 AR ?= ar
 FC ?= gfortran
 CC ?= gcc
-CFLAGS += -Wall -O3 -fopenmp -I $(SPOOLES_INCLUDE_DIR) -DARCH="Linux" -DSPOOLES -DARPACK -DMATRIXSTORAGE
-FFLAGS += -Wall -O3 -fopenmp
+#
+# Upstream's own Makefile and Makefile_MT for this release build at -O2, with
+# -cpp on FFLAGS and -DNETWORKOUT on CFLAGS.  Match them.
+#
+#   * -O2, not -O3.  The reference results the test suite compares against are
+#     produced by an -O2 build, so that is the configuration upstream
+#     validates.  (The -O3 divergences this package used to show were an
+#     out-of-bounds write in springforc_f2f.f, not an optimizer bug, and are
+#     fixed by patches/upstream-f2f-contact-array-bounds.patch.)
+#
+#   * -cpp.  move.f chooses between rename() and a copy-and-delete fallback
+#     with #if defined(__GFORTRAN__)/#else.  Without -cpp gfortran only warns
+#
+#       move.f:45:2: Warning: Illegal preprocessor directive
+#
+#     and compiles *both* branches, so *RESTART,WRITE,OVERLAY renames the file
+#     and then tries to copy the file it has just renamed away:
+#
+#       Error opening source file: 2
+#       *ERROR in restartwrite: temporaryrestartfile cannot be renamed
+#
+#     Reproducer: test/beamwrite2, which the suite's own compare script does
+#     not flag because the .dat and .frd files come out right anyway.
+#
+#   * -DNETWORKOUT, which upstream's default Makefile sets; it enables the
+#     jobname.net output for gas networks and liquid channels.
+#
+CFLAGS += -Wall -O2 -fopenmp -I $(SPOOLES_INCLUDE_DIR) -DARCH="Linux" -DSPOOLES -DARPACK -DMATRIXSTORAGE -DNETWORKOUT
+FFLAGS += -Wall -O2 -fopenmp -cpp
 
 .c.o :
 	$(CC) $(CFLAGS) -c $<
