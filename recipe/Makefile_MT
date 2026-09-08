@@ -28,7 +28,23 @@ CC ?= gcc
 #   * -DNETWORKOUT, which upstream's default Makefile sets; it enables the
 #     jobname.net output for gas networks and liquid channels.
 #
-CFLAGS += -Wall -O2 -fopenmp -I $(SPOOLES_INCLUDE_DIR) -DARCH="Linux" -DSPOOLES -DARPACK -DMATRIXSTORAGE -DNETWORKOUT
+#   * -DUSE_MT=1 and $(LIB_DIR)/spoolesMT.a, which are what makes upstream's
+#     Makefile_MT "_MT": without them spooles.c compiles its serial path and
+#     ccx reports "Using 1 cpu for spooles" however many threads it is given.
+#     spoolesMT.a has to precede spooles.a on the link line, and it needs
+#     pthreads.
+#
+#     This REQUIRES spooles build 1006 or later.  SPOOLES 2.2's MT factor and
+#     solve passed data between threads through plain memory with no
+#     synchronisation; x86's store ordering made that survivable and aarch64
+#     did not, so the multithreaded solver returned silently wrong results
+#     there.  Built against spooles 1005 or earlier this recipe produces a ccx
+#     that corrupts contact and CFD results as soon as OMP_NUM_THREADS>1.
+#     spooles.a is linked statically, so the fix is baked into the ccx binary
+#     at build time and there is no runtime constraint to express -- but this
+#     recipe must not be built until the fixed spooles is on the channel.
+#
+CFLAGS += -Wall -O2 -fopenmp -I $(SPOOLES_INCLUDE_DIR) -DARCH="Linux" -DSPOOLES -DARPACK -DMATRIXSTORAGE -DNETWORKOUT -DUSE_MT=1
 FFLAGS += -Wall -O2 -fopenmp -cpp
 
 .c.o :
@@ -45,7 +61,9 @@ OCCXC = $(SCCXC:.c=.o)
 OCCXMAIN = $(SCCXMAIN:.c=.o)
 
 LIBS = \
-    $(LIB_DIR)/spooles.a
+    $(LIB_DIR)/spoolesMT.a \
+    $(LIB_DIR)/spooles.a \
+    -lpthread -lm
 
 # date.pl is run by build.sh/build.bat before make, so that frd.c is stamped
 # before it is compiled; nothing to do here but link.

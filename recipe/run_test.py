@@ -14,6 +14,17 @@ one fails on a specific defect this recipe patches or works around:
   restart.inp    *RESTART,WRITE,OVERLAY over two steps; move.f renames the
                  restart file away and then fails to copy it when FFLAGS is
                  missing -cpp
+
+The contact model is then run a second time on four threads.  That checks the
+multithreaded solver is wired up at all -- ccx says "Using up to N cpu(s) for
+spooles" only when -DUSE_MT=1 and spoolesMT.a both took effect -- and that it
+gets the right answer on a model small enough to be worth running here.
+
+It is deliberately not the guard against SPOOLES' MT data races, which
+returned silently wrong results on weakly ordered CPUs before spooles build
+1006: a model this small does not reliably trip them.  spooles' own test does
+that, on a problem sized for it.  What this catches is the build going quiet
+-- the define dropped, the library unlinked, the link order reversed.
 """
 
 import math
@@ -42,17 +53,18 @@ if ccx is None:
     sys.exit("ccx is not on PATH")
 
 
-def run(jobname, want_frd=True):
+def run(jobname, want_frd=True, threads="1"):
     completed = subprocess.run(
         [ccx, jobname],
-        env=dict(os.environ, OMP_NUM_THREADS="1"),
+        env=dict(os.environ, OMP_NUM_THREADS=threads),
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True,
     )
     if completed.returncode != 0:
         sys.exit(
-            f"ccx {jobname} exited {completed.returncode}:\n{completed.stdout}"
+            f"ccx {jobname} exited {completed.returncode} on {threads}"
+            f" thread(s):\n{completed.stdout}"
         )
     with open(jobname + ".dat") as handle:
         dat = handle.read()
@@ -90,20 +102,27 @@ dat, _ = run("contact")
 with open("contact.dat.ref") as handle:
     reference = handle.read()
 
-got = [float(value) for value in NUMBER.findall(dat)]
 want = [float(value) for value in NUMBER.findall(reference)]
-if len(got) != len(want):
-    sys.exit(
-        f"contact.dat holds {len(got)} numbers, the reference holds {len(want)};"
-        f" the solver did not run the analysis to the end:\n{dat}"
-    )
-scale = CONTACT_TOLERANCE * max(abs(value) for value in want)
-for index, (value, expected) in enumerate(zip(got, want)):
-    if abs(value - expected) > scale:
+
+
+def check_contact(dat, threads):
+    got = [float(value) for value in NUMBER.findall(dat)]
+    if len(got) != len(want):
         sys.exit(
-            f"contact.dat value {index}: {value!r}, expected {expected!r}"
-            f" (tolerance {scale!r})\n{dat}"
+            f"contact.dat holds {len(got)} numbers, the reference holds"
+            f" {len(want)}, on {threads} thread(s); the solver did not run the"
+            f" analysis to the end:\n{dat}"
         )
+    scale = CONTACT_TOLERANCE * max(abs(value) for value in want)
+    for index, (value, expected) in enumerate(zip(got, want)):
+        if abs(value - expected) > scale:
+            sys.exit(
+                f"contact.dat value {index}: {value!r}, expected {expected!r}"
+                f" (tolerance {scale!r}) on {threads} thread(s)\n{dat}"
+            )
+
+
+check_contact(dat, "1")
 
 # 3. Mohr-Coulomb, exact answer
 dat, _ = run("mohr")
@@ -126,5 +145,15 @@ for value in peeq:
 _, output = run("restart", want_frd=False)
 if re.search(r"cannot be renamed|Error opening source file", output):
     sys.exit(f"*RESTART,WRITE,OVERLAY failed:\n{output}")
+
+# 5. the same contact model on four threads: the multithreaded SPOOLES solver
+#    has to be compiled in, and it has to get the same answer
+dat, output = run("contact", threads="4")
+if "cpu(s) for spooles" not in output:
+    sys.exit(
+        "ccx did not report the multithreaded spooles solver on 4 threads;"
+        " -DUSE_MT=1 or spoolesMT.a did not take effect:\n" + output
+    )
+check_contact(dat, "4")
 
 print("CalculiX tests passed")
