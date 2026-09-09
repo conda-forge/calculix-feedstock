@@ -3,13 +3,24 @@ FC ?= gfortran
 CC ?= gcc
 #
 # Upstream's own Makefile and Makefile_MT for this release build at -O2, with
-# -cpp on FFLAGS and -DNETWORKOUT on CFLAGS.  Match them.
+# -cpp on FFLAGS and -DNETWORKOUT on CFLAGS.  Match them, except for -O3.
 #
-#   * -O2, not -O3.  The reference results the test suite compares against are
-#     produced by an -O2 build, so that is the configuration upstream
-#     validates.  (The -O3 divergences this package used to show were an
-#     out-of-bounds write in springforc_f2f.f, not an optimizer bug, and are
-#     fixed by patches/upstream-f2f-contact-array-bounds.patch.)
+#   * -O3, where upstream uses -O2.  This package used to build at -O3 and
+#     produced wrong contact results, which is why an earlier revision of this
+#     file pinned -O2.  The cause was not the optimizer: springforc_f2f.f
+#     wrote past the end of fnl, and -O3's loop transforms acted on the
+#     undefined behaviour.  With
+#     patches/upstream-f2f-contact-array-bounds.patch applied, -O2 and -O3
+#     produce the *same* failure set on CalculiX's own 638-case suite -- not
+#     merely the same count, the same cases -- at 1 thread, at 8 threads, and
+#     with the solver threaded.  Before the patch it was 32 failures at -O2
+#     against 57 at -O3.
+#
+#     It is worth 5.4% on the 51 heaviest suite cases single-threaded, and it
+#     composes with the threaded solver below (-5.4% and -6.0% separately,
+#     -11.4% together).  Under OMP_NUM_THREADS-driven runs it is worth closer
+#     to 1%, because that time goes into OpenMP rather than into the Fortran
+#     kernels -O3 vectorises.  It costs 8.3% on the binary.
 #
 #   * -cpp.  move.f chooses between rename() and a copy-and-delete fallback
 #     with #if defined(__GFORTRAN__)/#else.  Without -cpp gfortran only warns
@@ -44,8 +55,8 @@ CC ?= gcc
 #     at build time and there is no runtime constraint to express -- but this
 #     recipe must not be built until the fixed spooles is on the channel.
 #
-CFLAGS += -Wall -O2 -fopenmp -I $(SPOOLES_INCLUDE_DIR) -DARCH="Linux" -DSPOOLES -DARPACK -DMATRIXSTORAGE -DNETWORKOUT -DUSE_MT=1
-FFLAGS += -Wall -O2 -fopenmp -cpp
+CFLAGS += -Wall -O3 -fopenmp -I $(SPOOLES_INCLUDE_DIR) -DARCH="Linux" -DSPOOLES -DARPACK -DMATRIXSTORAGE -DNETWORKOUT -DUSE_MT=1
+FFLAGS += -Wall -O3 -fopenmp -cpp
 
 .c.o :
 	$(CC) $(CFLAGS) -c $<
