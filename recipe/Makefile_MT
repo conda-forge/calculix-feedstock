@@ -1,8 +1,27 @@
 AR ?= ar
 FC ?= gfortran
 CC ?= gcc
-CFLAGS += -Wall -O3 -fopenmp -I $(SPOOLES_INCLUDE_DIR) -DARCH="Linux" -DSPOOLES -DARPACK -DMATRIXSTORAGE
-FFLAGS += -Wall -O3 -fopenmp
+#
+# Compiler flags follow upstream's own Makefile/Makefile_MT for this release.
+# Two deviations from upstream have caused wrong results in the past and must
+# not be reintroduced:
+#
+#   * -O2, not -O3.  gfortran -O3 miscompiles the CalculiX Fortran sources:
+#     e.g. test case cubef2f1 stops converging (residual stalls at ~5e+02
+#     instead of dropping to 4e-12) and burns minutes in step cutbacks.
+#     Only the Fortran side is affected; the C sources are fine at -O3.
+#
+#   * -cpp on FFLAGS.  move.f uses #if defined(__GFORTRAN__)/#else to pick
+#     between rename() and a copy-and-delete fallback.  Without -cpp gfortran
+#     merely warns ("Illegal preprocessor directive") and compiles *both*
+#     branches, so *RESTART,WRITE,OVERLAY renames the file and then fails to
+#     copy the file it just renamed away.
+#
+# -DNETWORKOUT matches upstream's default Makefile and enables the jobname.net
+# output for gas networks and liquid channels.
+#
+CFLAGS += -Wall -O2 -fopenmp -I $(SPOOLES_INCLUDE_DIR) -DARCH="Linux" -DSPOOLES -DARPACK -DMATRIXSTORAGE -DNETWORKOUT
+FFLAGS += -Wall -O2 -fopenmp -cpp
 
 .c.o :
 	$(CC) $(CFLAGS) -c $<
@@ -21,7 +40,7 @@ LIBS = \
     $(LIB_DIR)/spooles.a
 
 ccx_$(VERSION)_conda: $(OCCXMAIN) ccx_$(VERSION)_conda.a
-	perl date.pl && $(CC) $(CFLAGS) -c ccx_$(VERSION).c && $(FC) $(FFLAGS) -o $@ $(OCCXMAIN) ccx_$(VERSION)_conda.a $(LDFLAGS) -larpack -llapack -lblas $(LIBS)
+	$(FC) $(FFLAGS) -o $@ $(OCCXMAIN) ccx_$(VERSION)_conda.a $(LDFLAGS) -larpack -llapack -lblas $(LIBS)
 
 ccx_$(VERSION)_conda.a: $(OCCXF) $(OCCXC)
 	$(AR) vr $@ $?

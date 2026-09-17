@@ -1,6 +1,12 @@
 cd ccx*/src
 rm Makefile_MT
 cp ${RECIPE_DIR}/Makefile_MT Makefile_MT
+cp ${RECIPE_DIR}/date.pl date.pl
+
+# stamp the build date into the sources before anything is compiled, so that
+# frd.c (which writes UCOMPILETIME into every .frd) picks it up too
+perl date.pl
+
 if [[ ${HOST} =~ .*linux.* ]]; then
 	export LDFLAGS="${LDFLAGS} -lrt"
 fi

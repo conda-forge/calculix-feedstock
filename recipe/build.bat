@@ -3,6 +3,11 @@ del Makefile_MT
 copy %RECIPE_DIR%\Makefile_MT Makefile_MT
 copy "%RECIPE_DIR%\date.pl" date.pl
 
+rem stamp the build date into the sources before anything is compiled, so that
+rem frd.c (which writes UCOMPILETIME into every .frd) picks it up too
+perl date.pl
+if errorlevel 1 exit 1
+
 
 rem this line translates the windows-paths to paths understandable for the mingw env
 rem -m, --mixed           like --windows, but with regular slashes (C:/WINNT)

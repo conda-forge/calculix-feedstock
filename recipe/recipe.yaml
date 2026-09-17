@@ -19,9 +19,11 @@ source:
       then: patches/mingw_time.patch
     - if: win
       then: patches/fix-win-locale.patch
+    - if: win
+      then: patches/fix-locale-main.patch
 
 build:
-  number: 4
+  number: 5
 
 requirements:
   build:
@@ -60,6 +62,18 @@ tests:
         then: test -f $PREFIX/bin/ccx
       - if: win
         then: if not exist %LIBRARY_PREFIX%\bin\ccx.exe exit 1
+  # actually solve something: a build that links but miscomputes has shipped
+  # from here before
+  - script: python run_test.py
+    files:
+      recipe:
+        - run_test.py
+        - smoketest.inp
+        - contact.inp
+        - contact.dat.ref
+    requirements:
+      run:
+        - python
 
 about:
   license: GPL-2.0-or-later
