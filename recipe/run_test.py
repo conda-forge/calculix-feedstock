@@ -2,7 +2,7 @@
 
 A build that merely links is not enough here: this recipe has shipped
 executables that started fine and then produced non-converging or
-locale-mangled results.  So run four models and look at the numbers.  Each
+locale-mangled results.  So run five models and look at the numbers.  Each
 one fails on a specific defect this recipe patches or works around:
 
   smoketest.inp  one linear hexahedron, answer known in closed form
@@ -20,7 +20,16 @@ multithreaded solver is wired up at all -- ccx says "Using up to N cpu(s) for
 spooles" only when -DUSE_MT=1 and spoolesMT.a both took effect -- and that it
 gets the right answer on a model small enough to be worth running here.
 
-It is deliberately not the guard against SPOOLES' MT data races, which
+Last, cfd.inp -- CalculiX's test/coucylcent2.inp, a 320-node *CFD model with
+MPCs -- runs on four threads.  Unpatched 2.23 split the boundary conditions
+over the CFD threads and got it wrong in 17 of 20 runs at four threads, and it
+created threads for every loop of every iteration, which made every small
+*CFD model several times slower threaded than on one core.  The patches apply
+the boundary conditions on one thread and keep a mesh this small on one
+thread altogether, so ccx has to say so, and the answer has to match the
+reference.
+
+The contact check is deliberately not the guard against SPOOLES' MT data races, which
 returned silently wrong results on weakly ordered CPUs before spooles build
 1006: a model this small does not reliably trip them.  spooles' own test does
 that, on a problem sized for it.  What this catches is the build going quiet
@@ -155,5 +164,37 @@ if "cpu(s) for spooles" not in output:
         " -DUSE_MT=1 or spoolesMT.a did not take effect:\n" + output
     )
 check_contact(dat, "4")
+
+# 6. a small *CFD model on four threads: it has to stay on one thread, and it
+#    has to reproduce CalculiX's own reference, block by block as datcheck.pl
+#    compares it
+dat, output = run("cfd", want_frd=False, threads="4")
+if "Using up to 1 cpu(s) for CFD" not in output:
+    sys.exit(
+        "ccx threaded a 320-node *CFD model; fix-cfd-small-mesh-threads.patch"
+        " did not take effect:\n" + output
+    )
+with open("cfd.dat.ref") as handle:
+    reference = handle.read()
+
+
+def cfd_blocks(text):
+    # one list of numbers per " velocities ...", " static pressures ..." block
+    return [NUMBER.findall(block) for block in re.split(r"\n \w[^\n]*for set", text)[1:]]
+
+
+got_blocks, want_blocks = cfd_blocks(dat), cfd_blocks(reference)
+if [len(block) for block in got_blocks] != [len(block) for block in want_blocks]:
+    sys.exit(f"cfd.dat does not have the reference's blocks:\n{dat}")
+for got_block, want_block in zip(got_blocks, want_blocks):
+    got_block = [float(value) for value in got_block]
+    want_block = [float(value) for value in want_block]
+    scale = CONTACT_TOLERANCE * max(abs(value) for value in want_block)
+    for value, expected in zip(got_block, want_block):
+        if abs(value - expected) > scale:
+            sys.exit(
+                f"cfd.dat value {value!r}, expected {expected!r}"
+                f" (tolerance {scale!r}) on 4 threads\n{dat}"
+            )
 
 print("CalculiX tests passed")

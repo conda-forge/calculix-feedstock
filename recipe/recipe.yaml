@@ -23,6 +23,12 @@ source:
     - patches/upstream-readfrd-return-value.patch
     - patches/upstream-locale-numeric.patch
     - patches/upstream-makefile-inc-mafillmm.patch
+    # threaded *CFD applied MPC's before the SPC's they read; fixed upstream
+    # by the OpenMP rewrite of compfluidfem (9e8ce89); drop once released
+    - patches/fix-cfd-threaded-boundary-conditions.patch
+    # 2.23 creates and joins threads for every loop of every *CFD iteration,
+    # so small meshes run several times slower threaded than on one core
+    - patches/fix-cfd-small-mesh-threads.patch
     - if: win or osx
       then: patches/mingw_time.patch
     - if: win
@@ -79,6 +85,8 @@ tests:
         - contact.dat.ref
         - mohr.inp
         - restart.inp
+        - cfd.inp
+        - cfd.dat.ref
     requirements:
       run:
         - python
