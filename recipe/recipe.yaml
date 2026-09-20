@@ -29,6 +29,16 @@ source:
     # 2.23 creates and joins threads for every loop of every *CFD iteration,
     # so small meshes run several times slower threaded than on one core
     - patches/fix-cfd-small-mesh-threads.patch
+    # defects Dhondt fixed upstream after 2.23 was posted (2 Nov 2025), up to
+    # e9e57ed of 17 Sep 2026; drop these when 2.24 is released
+    - patches/upstream-initial-conditions-solution.patch
+    - patches/upstream-boundary-fixed-cylindrical.patch
+    - patches/upstream-gen3dnor-expansion-normals.patch
+    - patches/upstream-materialdata-th-density.patch
+    - patches/upstream-nonlingeo-intscheme.patch
+    - patches/upstream-c3d8r-stable-time-increment.patch
+    - patches/upstream-allocation-debug-print.patch
+    - patches/upstream-friction-stick-slope.patch
     - if: win or osx
       then: patches/mingw_time.patch
     - if: win
