@@ -58,7 +58,10 @@ requirements:
     - libblas
     - liblapack
     - arpack
-    - spooles
+    # spoolesMT.a is linked statically and its data races were only fixed in
+    # build 1006, so an older build bakes silently wrong threaded results into
+    # ccx with nothing at run time to express the constraint; see Makefile_MT
+    - spooles[version ='>=2.2',build_number='>=1006']
     - if: osx
       then:
         - llvm-openmp
