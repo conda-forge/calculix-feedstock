@@ -228,4 +228,5 @@ Feedstock Maintainers
 
 * [@Krande](https://github.com/Krande/)
 * [@looooo](https://github.com/looooo/)
+* [@oursland](https://github.com/oursland/)
 
