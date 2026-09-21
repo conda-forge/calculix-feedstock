@@ -15,13 +15,37 @@ source:
   patches:
     - patches/avoid-ifport.patch
     - patches/fix-readnewmesh-return.patch
+    # submitted upstream; drop these when they land in a release
+    - patches/upstream-f2f-contact-array-bounds.patch
+    - patches/upstream-frictionless-contact-slip.patch
+    - patches/upstream-nonlinmpc-straight-mpc.patch
+    - patches/upstream-mohrcoulomb-degenerate-return.patch
+    - patches/upstream-readfrd-return-value.patch
+    - patches/upstream-locale-numeric.patch
+    - patches/upstream-makefile-inc-mafillmm.patch
+    # threaded *CFD applied MPC's before the SPC's they read; fixed upstream
+    # by the OpenMP rewrite of compfluidfem (9e8ce89); drop once released
+    - patches/fix-cfd-threaded-boundary-conditions.patch
+    # 2.23 creates and joins threads for every loop of every *CFD iteration,
+    # so small meshes run several times slower threaded than on one core
+    - patches/fix-cfd-small-mesh-threads.patch
+    # defects Dhondt fixed upstream after 2.23 was posted (2 Nov 2025), up to
+    # e9e57ed of 17 Sep 2026; drop these when 2.24 is released
+    - patches/upstream-initial-conditions-solution.patch
+    - patches/upstream-boundary-fixed-cylindrical.patch
+    - patches/upstream-gen3dnor-expansion-normals.patch
+    - patches/upstream-materialdata-th-density.patch
+    - patches/upstream-nonlingeo-intscheme.patch
+    - patches/upstream-c3d8r-stable-time-increment.patch
+    - patches/upstream-allocation-debug-print.patch
+    - patches/upstream-friction-stick-slope.patch
     - if: win or osx
       then: patches/mingw_time.patch
     - if: win
       then: patches/fix-win-locale.patch
 
 build:
-  number: 4
+  number: 5
 
 requirements:
   build:
@@ -44,7 +68,10 @@ requirements:
     - libblas
     - liblapack
     - arpack
-    - spooles
+    # spoolesMT.a is linked statically and its data races were only fixed in
+    # build 1006, so an older build bakes silently wrong threaded results into
+    # ccx with nothing at run time to express the constraint; see Makefile_MT
+    - spooles[version ='>=2.2',build_number='>=1006']
     - if: osx
       then:
         - llvm-openmp
@@ -60,6 +87,22 @@ tests:
         then: test -f $PREFIX/bin/ccx
       - if: win
         then: if not exist %LIBRARY_PREFIX%\bin\ccx.exe exit 1
+  # a build that links but miscomputes has shipped from here before, so
+  # actually solve something and check the numbers
+  - script: python run_test.py
+    files:
+      recipe:
+        - run_test.py
+        - smoketest.inp
+        - contact.inp
+        - contact.dat.ref
+        - mohr.inp
+        - restart.inp
+        - cfd.inp
+        - cfd.dat.ref
+    requirements:
+      run:
+        - python
 
 about:
   license: GPL-2.0-or-later

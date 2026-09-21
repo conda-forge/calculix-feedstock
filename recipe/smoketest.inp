@@ -1,0 +1,38 @@
+**
+**   Minimal smoke test for the conda-forge CalculiX package.
+**
+**   One linear hexahedron (C3D8), 100x100x100, clamped on one face and
+**   loaded by a 1 MPa pressure on the opposite one.  With E = 210000 MPa
+**   and nu = 0.3 the free face must displace by exactly
+**   u = -p*L/E = -1.0*100/210000 = -4.76190e-04.
+**
+*NODE, NSET=Nall
+1,   0.,   0.,   0.
+2, 100.,   0.,   0.
+3, 100., 100.,   0.
+4,   0., 100.,   0.
+5,   0.,   0., 100.
+6, 100.,   0., 100.
+7, 100., 100., 100.
+8,   0., 100., 100.
+*ELEMENT, TYPE=C3D8, ELSET=Eall
+1, 1, 2, 3, 4, 5, 6, 7, 8
+*NSET, NSET=Nfix
+1, 2, 3, 4
+*MATERIAL, NAME=STEEL
+*ELASTIC
+210000., 0.3
+*SOLID SECTION, ELSET=Eall, MATERIAL=STEEL
+*STEP
+*STATIC
+*BOUNDARY
+Nfix, 3, 3, 0.
+1, 1, 2, 0.
+2, 2, 2, 0.
+*DLOAD
+1, P2, 1.
+*NODE PRINT, NSET=Nall
+U
+*NODE FILE
+U
+*END STEP

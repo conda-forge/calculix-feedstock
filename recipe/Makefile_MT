@@ -1,8 +1,69 @@
 AR ?= ar
 FC ?= gfortran
 CC ?= gcc
-CFLAGS += -Wall -O3 -fopenmp -I $(SPOOLES_INCLUDE_DIR) -DARCH="Linux" -DSPOOLES -DARPACK -DMATRIXSTORAGE
-FFLAGS += -Wall -O3 -fopenmp
+#
+# Upstream's own Makefile and Makefile_MT for this release build at -O2, with
+# -cpp on FFLAGS and -DNETWORKOUT on CFLAGS.  Match them.
+#
+#   * -O2, as upstream.  An earlier revision of this file built at -O3.  That
+#     is safe as far as the test suite goes -- with
+#     patches/upstream-f2f-contact-array-bounds.patch applied (without it,
+#     -O3's loop transforms act on the out-of-bounds write in
+#     springforc_f2f.f and it was 32 failures at -O2 against 57 at -O3), -O2
+#     and -O3 produce the *same* failure set on CalculiX's own 638-case
+#     suite, not merely the same count but the same cases, at 1 thread, at 8
+#     threads, and with the solver threaded.
+#
+#     It is not worth it here.  -O3 buys 5.4% on the 51 heaviest suite cases
+#     single-threaded, but only about 1% once OMP_NUM_THREADS is driving the
+#     run, because that time goes into OpenMP rather than into the Fortran
+#     kernels -O3 vectorises -- and threaded is how this package is used.
+#     It costs 8.3% on the binary.
+#
+#     Against that ~1%: -O3 together with the threaded solver below is the
+#     one configuration in which test/load1 (tied contact, NLGEOM) lands on
+#     a solution 356x the block maximum away from its reference -- 6 runs in
+#     10 at OMP_NUM_THREADS=4, and 10 in 10 with
+#     CCX_NPROC_EQUATION_SOLVER=1, so disabling solver threading makes it
+#     worse rather than better and the solver alone does not explain it.
+#     Serial-SPOOLES builds at either -O2 or -O3 never reproduce it.  The
+#     defect is undiagnosed; until it is, take upstream's flag.
+#
+#   * -cpp.  move.f chooses between rename() and a copy-and-delete fallback
+#     with #if defined(__GFORTRAN__)/#else.  Without -cpp gfortran only warns
+#
+#       move.f:45:2: Warning: Illegal preprocessor directive
+#
+#     and compiles *both* branches, so *RESTART,WRITE,OVERLAY renames the file
+#     and then tries to copy the file it has just renamed away:
+#
+#       Error opening source file: 2
+#       *ERROR in restartwrite: temporaryrestartfile cannot be renamed
+#
+#     Reproducer: test/beamwrite2, which the suite's own compare script does
+#     not flag because the .dat and .frd files come out right anyway.
+#
+#   * -DNETWORKOUT, which upstream's default Makefile sets; it enables the
+#     jobname.net output for gas networks and liquid channels.
+#
+#   * -DUSE_MT=1 and $(LIB_DIR)/spoolesMT.a, which are what makes upstream's
+#     Makefile_MT "_MT": without them spooles.c compiles its serial path and
+#     ccx reports "Using 1 cpu for spooles" however many threads it is given.
+#     spoolesMT.a has to precede spooles.a on the link line, and it needs
+#     pthreads.
+#
+#     This REQUIRES spooles build 1006 or later.  SPOOLES 2.2's MT factor and
+#     solve passed data between threads through plain memory with no
+#     synchronisation; x86's store ordering made that survivable and aarch64
+#     did not, so the multithreaded solver returned silently wrong results
+#     there.  Built against spooles 1005 or earlier this recipe produces a ccx
+#     that corrupts contact and CFD results as soon as OMP_NUM_THREADS>1.
+#     spooles.a is linked statically, so the fix is baked into the ccx binary
+#     at build time and there is no runtime constraint to express -- but this
+#     recipe must not be built until the fixed spooles is on the channel.
+#
+CFLAGS += -Wall -O2 -fopenmp -I $(SPOOLES_INCLUDE_DIR) -DARCH="Linux" -DSPOOLES -DARPACK -DMATRIXSTORAGE -DNETWORKOUT -DUSE_MT=1
+FFLAGS += -Wall -O2 -fopenmp -cpp
 
 .c.o :
 	$(CC) $(CFLAGS) -c $<
@@ -18,10 +79,14 @@ OCCXC = $(SCCXC:.c=.o)
 OCCXMAIN = $(SCCXMAIN:.c=.o)
 
 LIBS = \
-    $(LIB_DIR)/spooles.a
+    $(LIB_DIR)/spoolesMT.a \
+    $(LIB_DIR)/spooles.a \
+    -lpthread -lm
 
+# date.pl is run by build.sh/build.bat before make, so that frd.c is stamped
+# before it is compiled; nothing to do here but link.
 ccx_$(VERSION)_conda: $(OCCXMAIN) ccx_$(VERSION)_conda.a
-	perl date.pl && $(CC) $(CFLAGS) -c ccx_$(VERSION).c && $(FC) $(FFLAGS) -o $@ $(OCCXMAIN) ccx_$(VERSION)_conda.a $(LDFLAGS) -larpack -llapack -lblas $(LIBS)
+	$(FC) $(FFLAGS) -o $@ $(OCCXMAIN) ccx_$(VERSION)_conda.a $(LDFLAGS) -larpack -llapack -lblas $(LIBS)
 
 ccx_$(VERSION)_conda.a: $(OCCXF) $(OCCXC)
 	$(AR) vr $@ $?
