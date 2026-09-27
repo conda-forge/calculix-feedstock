@@ -65,6 +65,8 @@ source:
     # face-to-face contact with PRESSURE-OVERCLOSURE=TABULAR used the old
     # 82-entry layout of plconloc that materialdata_sp.f no longer fills
     - patches/fix-f2f-tabular-overclosure.patch
+    # found by AddressSanitizer on FreeCAD's ccx_1D_fluid_network example
+    - patches/fix-preinitialnet-inlet-neighbor.patch
     - if: win or osx
       then: patches/mingw_time.patch
     - if: win
