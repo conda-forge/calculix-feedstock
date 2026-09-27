@@ -1,0 +1,45 @@
+**
+**   Rotational DOFs constrained on an axisymmetric model.
+**
+**   One CAX4 element, a solid cylinder of radius 10 and length 100, loaded
+**   by a 1 MPa pressure on its top face.  The base slides radially, so the
+**   stress is uniaxial and, with E = 210000 MPa and nu = 0.3,
+**
+**     uz(top) = -p*L/E    = -1.0*100/210000    = -4.76190E-04
+**     ur(R)   = nu*p*R/E  =  0.3*1.0*10/210000 =  1.42857E-05
+**
+**   ccx models a CAX element as a 2 degree wedge and reports ur for the
+**   wedge faces, 1 degree either side of the r-z plane, along the r axis:
+**   1.42857E-05*cos(1 deg) = 1.42835E-05.
+**
+**   The base nodes also have DOFs 4 to 6 fixed, like the "fix everything"
+**   *BOUNDARY of the model in FreeCAD/FreeCAD#10865.  Axisymmetric elements
+**   have no rotational DOFs, so those SPCs must change nothing.  Unpatched,
+**   gen3dboun.f builds a mean rotation MPC for them from loop bounds it only
+**   sets for shells and beams, so what it reads depends on what was left on
+**   the stack.
+**
+*NODE, NSET=Nall
+1,  0.,   0.
+2, 10.,   0.
+3, 10., 100.
+4,  0., 100.
+*ELEMENT, TYPE=CAX4, ELSET=Eall
+1, 1, 2, 3, 4
+*NSET, NSET=Nbase
+1, 2
+*MATERIAL, NAME=STEEL
+*ELASTIC
+210000., 0.3
+*SOLID SECTION, ELSET=Eall, MATERIAL=STEEL
+*STEP
+*STATIC
+*BOUNDARY
+Nbase, 2, 2, 0.
+1, 1, 1, 0.
+Nbase, 4, 6, 0.
+*DLOAD
+1, P3, 1.
+*NODE PRINT, NSET=Nall
+U
+*END STEP
