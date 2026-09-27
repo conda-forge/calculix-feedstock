@@ -1,0 +1,28 @@
+**
+**   An *HCF card without its INPUT= parameter.
+**
+**   hcfs.f reports this through inputerror.f, which sets its last
+**   argument, ier, to flag a fatal input error.  hcfs.f left ier out of all
+**   three of its inputerror calls, so inputerror stored through whatever came
+**   next on the argument list -- the hidden length of inpc, 1 -- and ccx
+**   segfaulted at address 0x1 instead of reporting the missing parameter.
+**
+*NODE, NSET=Nall
+1,   0.,   0.,   0.
+2, 100.,   0.,   0.
+3, 100., 100.,   0.
+4,   0., 100.,   0.
+5,   0.,   0., 100.
+6, 100.,   0., 100.
+7, 100., 100., 100.
+8,   0., 100., 100.
+*ELEMENT, TYPE=C3D8, ELSET=Eall
+1, 1, 2, 3, 4, 5, 6, 7, 8
+*MATERIAL, NAME=STEEL
+*ELASTIC
+210000., 0.3
+*SOLID SECTION, ELSET=Eall, MATERIAL=STEEL
+*STEP
+*HCF, MODE=1, MISSIONSTEP=1
+*STATIC
+*END STEP

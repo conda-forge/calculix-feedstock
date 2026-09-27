@@ -41,6 +41,10 @@ nothing.  So it has to say it ignored the SPCs, and get the closed-form
 answer.  axirotload.inp puts a moment on a node, which crashes unpatched ccx
 on macOS as built; it has to stop with an error instead.
 
+hcfnoinput.inp is an *HCF card without INPUT=.  hcfs.f called inputerror.f
+without its ier argument, so reporting the error stored through a bogus
+pointer and ccx segfaulted; it has to exit with the error message.
+
 The contact check is deliberately not the guard against SPOOLES' MT data races, which
 returned silently wrong results on weakly ordered CPUs before spooles build
 1006: a model this small does not reliably trip them.  spooles' own test does
@@ -250,6 +254,20 @@ if completed.returncode != 201 or "*ERROR in gen3dforc" not in completed.stdout:
     sys.exit(
         f"ccx axirotload exited {completed.returncode}; expected 201 and"
         f" \"*ERROR in gen3dforc\":\n{completed.stdout}"
+    )
+
+# 9. an input error in *HCF is reported, not a segfault
+completed = subprocess.run(
+    [ccx, "hcfnoinput"],
+    env=dict(os.environ, OMP_NUM_THREADS="1"),
+    stdout=subprocess.PIPE,
+    stderr=subprocess.STDOUT,
+    text=True,
+)
+if completed.returncode != 201 or "no input file specified" not in completed.stdout:
+    sys.exit(
+        f"ccx hcfnoinput exited {completed.returncode}; expected 201 and"
+        f" \"no input file specified\":\n{completed.stdout}"
     )
 
 print("CalculiX tests passed")
