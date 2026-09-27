@@ -1,0 +1,33 @@
+**
+**   A moment on an axisymmetric model.
+**
+**   The same cylinder as axirot.inp, with a moment on a top node.
+**   Axisymmetric elements have no rotational DOFs to carry it, and dropping
+**   a load silently would hide the mistake, so ccx has to stop with an
+**   error.
+**
+*NODE, NSET=Nall
+1,  0.,   0.
+2, 10.,   0.
+3, 10., 100.
+4,  0., 100.
+*ELEMENT, TYPE=CAX4, ELSET=Eall
+1, 1, 2, 3, 4
+*NSET, NSET=Nbase
+1, 2
+*MATERIAL, NAME=STEEL
+*ELASTIC
+210000., 0.3
+*SOLID SECTION, ELSET=Eall, MATERIAL=STEEL
+*STEP
+*STATIC
+*BOUNDARY
+Nbase, 2, 2, 0.
+1, 1, 1, 0.
+*DLOAD
+1, P3, 1.
+*CLOAD
+3, 6, 1.
+*NODE PRINT, NSET=Nall
+U
+*END STEP

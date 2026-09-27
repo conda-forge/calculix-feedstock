@@ -29,6 +29,18 @@ the boundary conditions on one thread and keep a mesh this small on one
 thread altogether, so ccx has to say so, and the answer has to match the
 reference.
 
+Then two axisymmetric models with rotational DOFs, which such elements do not
+have.  gen3dboun.f and gen3dforc.f send a rotational SPC or moment on a plane
+or axisymmetric node into their mean rotation code, whose loop bounds are set
+only for shells and beams, so ccx indexes memory with whatever is on the
+stack.  axirot.inp fixes DOFs 4 to 6 on its base, as the model in
+FreeCAD/FreeCAD#10865 does, which dies silently after "STEP 1" on Windows;
+with integers poisoned by -finit-integer it segfaults at that point on macOS
+too, and otherwise builds a meaningless MPC there that happens to change
+nothing.  So it has to say it ignored the SPCs, and get the closed-form
+answer.  axirotload.inp puts a moment on a node, which crashes unpatched ccx
+on macOS as built; it has to stop with an error instead.
+
 The contact check is deliberately not the guard against SPOOLES' MT data races, which
 returned silently wrong results on weakly ordered CPUs before spooles build
 1006: a model this small does not reliably trip them.  spooles' own test does
@@ -47,6 +59,10 @@ import sys
 # significant digits, so compare at that precision
 EXPECTED_UZ = -100.0 / 210000.0
 SMOKE_TOLERANCE = 1.0e-6 * abs(EXPECTED_UZ)
+
+# axirot.inp: the same load on a cylinder of radius 10; ccx reports ur for the
+# faces of the 2 degree wedge it models a CAX element with, along the r axis
+EXPECTED_UR = 0.3 * 1.0 * 10.0 / 210000.0 * math.cos(math.radians(1.0))
 
 # simple shear of 0.01 in a Mohr-Coulomb material that yields at zero stress
 EXPECTED_PEEQ = 0.01 / math.sqrt(3.0)
@@ -196,5 +212,44 @@ for got_block, want_block in zip(got_blocks, want_blocks):
                 f"cfd.dat value {value!r}, expected {expected!r}"
                 f" (tolerance {scale!r}) on 4 threads\n{dat}"
             )
+
+# 7. rotational SPCs on an axisymmetric model are ignored, with a warning
+dat, output = run("axirot", want_frd=False)
+if output.count("*WARNING in gen3dboun") != 6:
+    sys.exit(
+        "ccx did not report ignoring the 6 rotational SPCs of axirot.inp;"
+        " fix-2d-rotational-dofs.patch did not take effect:\n" + output
+    )
+displacements = re.findall(
+    r"^\s*([1-4])((?:\s+-?\d\.\d+E[-+]\d+){3})\s*$", dat, re.MULTILINE
+)
+if len(displacements) != 4:
+    sys.exit(f"expected 4 nodal displacements, parsed {len(displacements)}:\n{dat}")
+for node, values in displacements:
+    ur, uz, _ = (float(value) for value in values.split())
+    expected_ur = EXPECTED_UR if node in "23" else 0.0
+    expected_uz = EXPECTED_UZ if node in "34" else 0.0
+    if (
+        abs(ur - expected_ur) > 1.0e-5 * EXPECTED_UR
+        or abs(uz - expected_uz) > SMOKE_TOLERANCE
+    ):
+        sys.exit(
+            f"axirot node {node}: (ur, uz) = ({ur!r}, {uz!r}), expected"
+            f" ({expected_ur!r}, {expected_uz!r})\n{dat}"
+        )
+
+# 8. a moment on an axisymmetric model is an input error, not a crash
+completed = subprocess.run(
+    [ccx, "axirotload"],
+    env=dict(os.environ, OMP_NUM_THREADS="1"),
+    stdout=subprocess.PIPE,
+    stderr=subprocess.STDOUT,
+    text=True,
+)
+if completed.returncode != 201 or "*ERROR in gen3dforc" not in completed.stdout:
+    sys.exit(
+        f"ccx axirotload exited {completed.returncode}; expected 201 and"
+        f" \"*ERROR in gen3dforc\":\n{completed.stdout}"
+    )
 
 print("CalculiX tests passed")
