@@ -41,6 +41,9 @@ source:
     - patches/upstream-friction-stick-slope.patch
     # 88e8f90 (20 Jan 2026), missed above because its message is empty
     - patches/upstream-e-c3d-rhs-th-dflux-arguments.patch
+    # b164a60 (5 Dec 2025, a squashed commit) and 428d10e (19 Dec 2025)
+    # nest guards that read null arrays; also missed above
+    - patches/upstream-null-array-guards.patch
     # a rotational SPC or moment on a plane stress, plane strain or
     # axisymmetric node reaches the mean rotation code, which sets its loop
     # bounds only for shells and beams; FreeCAD/FreeCAD#10865
@@ -50,6 +53,11 @@ source:
     # whatever follows the last argument actually passed
     - patches/fix-missing-ier-arguments.patch
     - patches/fix-extrapolate-se-beam-sections.patch
+    # found by AddressSanitizer and by poisoning uninitialised memory over
+    # CalculiX's suite and FreeCAD's FEM test models
+    - patches/fix-electromagnetics-ithermal-array.patch
+    - patches/fix-cd-lab-correction-edges.patch
+    - patches/fix-calinput-cs-guard.patch
     - if: win or osx
       then: patches/mingw_time.patch
     - if: win
