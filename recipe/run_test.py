@@ -41,6 +41,10 @@ nothing.  So it has to say it ignored the SPCs, and get the closed-form
 answer.  axirotload.inp puts a moment on a node, which crashes unpatched ccx
 on macOS as built; it has to stop with an error instead.
 
+bleedtap.inp is a gas network bleed tapping: orifice.f passed its curve
+number to cd_bleedtapping.f as a real*8 where an integer is read, so no
+curve was used and printing the element summary stopped ccx.
+
 hcfnoinput.inp is an *HCF card without INPUT=.  hcfs.f called inputerror.f
 without its ier argument, so reporting the error stored through a bogus
 pointer and ccx segfaulted; it has to exit with the error message.
@@ -269,5 +273,25 @@ if completed.returncode != 201 or "no input file specified" not in completed.std
         f"ccx hcfnoinput exited {completed.returncode}; expected 201 and"
         f" \"no input file specified\":\n{completed.stdout}"
     )
+
+# 10. a bleed tapping has to use the discharge curve it was given
+run("bleedtap")
+with open("bleedtap.net") as handle:
+    net = handle.read()
+summary = re.search(
+    r"P2/P1 =\s*(\S+) , ps1pt1 =\s*(\S+) , DAB =\s*(\S+) , curve No =\s*(\d+)"
+    r" , cd =\s*(\S+)",
+    net,
+)
+if summary is None:
+    sys.exit(f"bleedtap.net has no bleed tapping summary:\n{net}")
+p2p1, ps1pt1, dab, curve, cd = summary.groups()
+p2p1, ps1pt1, dab, cd = (float(v) for v in (p2p1, ps1pt1, dab, cd))
+# the summary prints four significant digits
+if curve != "1" or abs(dab - (1 - p2p1) / (1 - ps1pt1)) > 1.0e-3 * dab:
+    sys.exit(f"bleedtap: curve {curve}, DAB {dab!r} from P2/P1 {p2p1!r}:\n{net}")
+expected_cd = 0.167 + (0.310 - 0.167) * (dab - 0.24) / (0.52 - 0.24)
+if not 0.24 < dab < 0.52 or abs(cd - expected_cd) > 1.0e-3 * expected_cd:
+    sys.exit(f"bleedtap: cd {cd!r}, expected {expected_cd!r} at DAB {dab!r}:\n{net}")
 
 print("CalculiX tests passed")

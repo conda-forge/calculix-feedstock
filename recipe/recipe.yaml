@@ -61,6 +61,7 @@ source:
     # calls whose arguments do not line up with the routine called, found by
     # checking every call against its callee
     - patches/fix-flux-rcavi-physcon.patch
+    - patches/fix-orifice-curve-integer.patch
     - if: win or osx
       then: patches/mingw_time.patch
     - if: win
@@ -125,6 +126,7 @@ tests:
         - axirot.inp
         - axirotload.inp
         - hcfnoinput.inp
+        - bleedtap.inp
     requirements:
       run:
         - python
