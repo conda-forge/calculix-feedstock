@@ -39,6 +39,10 @@ source:
     - patches/upstream-c3d8r-stable-time-increment.patch
     - patches/upstream-allocation-debug-print.patch
     - patches/upstream-friction-stick-slope.patch
+    # a rotational SPC or moment on a plane stress, plane strain or
+    # axisymmetric node reaches the mean rotation code, which sets its loop
+    # bounds only for shells and beams; FreeCAD/FreeCAD#10865
+    - patches/fix-2d-rotational-dofs.patch
     - if: win or osx
       then: patches/mingw_time.patch
     - if: win
