@@ -51,6 +51,13 @@ straight line, TABULAR: springforc_f2f.f and springstiff_f2f.f passed an
 and read the curve length from entry 81, so every face-to-face model with a
 tabular pressure-overclosure crashed or failed to converge.
 
+Last, smoketest.inp is broken in seven ways a hand-edited deck can be --
+element nodes that are 0 or undefined, no *NODE card, node number 0,
+*END STEP without *STEP, a section on undefined elements, a negative
+degree of freedom -- and every one has to be rejected with an *ERROR and
+exit code 201.  Fuzzing such variants of 518 decks found 71 places where
+ccx instead crashed, hung or silently worked on memory it did not own.
+
 hcfnoinput.inp is an *HCF card without INPUT=.  hcfs.f called inputerror.f
 without its ier argument, so reporting the error stored through a bogus
 pointer and ccx segfaulted; it has to exit with the error message.
@@ -321,5 +328,47 @@ want = [float(v) for v in NUMBER.findall(linear)]
 scale = CONTACT_TOLERANCE * max(abs(v) for v in want)
 if len(got) != len(want) or any(abs(a - b) > scale for a, b in zip(got, want)):
     sys.exit(f"tabular overclosure differs from linear:\n{tabular}\nlinear:\n{linear}")
+
+# 12. malformed input has to be rejected with an *ERROR, not crash or run
+with open("smoketest.inp") as handle:
+    smoke = handle.read()
+first_node, element = "8,   0., 100., 100.", "1, 1, 2, 3, 4, 5, 6, 7, 8"
+section = "*SOLID SECTION, ELSET=Eall"
+if first_node not in smoke or element not in smoke or section not in smoke:
+    sys.exit("smoketest.inp no longer has the lines test 12 edits")
+malformed = {
+    # an element node that is 0, or beyond every defined node
+    "badnode0": smoke.replace(element, "1, 1, 2, 3, 4, 5, 6, 7, 0"),
+    "badnode99": smoke.replace(element, "1, 1, 2, 3, 4, 5, 6, 7, 99"),
+    # no *NODE card at all
+    "badnonode": smoke[:smoke.index("*NODE")] + smoke[smoke.index("*ELEMENT"):],
+    # a *NODE line with node number 0
+    "badnodenum": smoke.replace(first_node, "0,   0., 100., 100."),
+    # *END STEP without *STEP
+    "badnostep": smoke.replace("*STEP\n", ""),
+    # a section on a set with elements that do not exist
+    "badelset": smoke.replace(section, "*ELSET, ELSET=Ebad\n1, 5\n" + section[:-4] + "Ebad"),
+    # a negative degree of freedom
+    "baddof": smoke.replace("Nfix, 3, 3, 0.", "Nfix, -3, 3, 0."),
+}
+for name, deck in malformed.items():
+    with open(name + ".inp", "w") as handle:
+        handle.write(deck)
+    try:
+        completed = subprocess.run(
+            [ccx, name],
+            env=dict(os.environ, OMP_NUM_THREADS="1"),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            timeout=300,
+        )
+    except subprocess.TimeoutExpired:
+        sys.exit(f"ccx {name} did not finish in 300 s on malformed input")
+    if completed.returncode != 201 or "*ERROR" not in completed.stdout:
+        sys.exit(
+            f"ccx {name} exited {completed.returncode} on malformed input;"
+            f" expected 201 and an *ERROR:\n{completed.stdout}"
+        )
 
 print("CalculiX tests passed")

@@ -67,6 +67,19 @@ source:
     - patches/fix-f2f-tabular-overclosure.patch
     # found by AddressSanitizer on FreeCAD's ccx_1D_fluid_network example
     - patches/fix-preinitialnet-inlet-neighbor.patch
+    # crashes, hangs and silent out-of-bounds accesses on malformed input,
+    # found by fuzzing 518 decks under AddressSanitizer; each such input now
+    # ends in an *ERROR and exit code 201
+    - patches/fix-malformed-input-nodes-elements.patch
+    - patches/fix-malformed-input-sets-sections.patch
+    - patches/fix-malformed-input-fluid.patch
+    - patches/fix-malformed-input-materials.patch
+    - patches/fix-malformed-input-parsing.patch
+    # two fluid network loops that test the wrong element; these change
+    # results for valid models
+    - patches/fix-fluid-network-labels.patch
+    - patches/fix-malformed-input-misc.patch
+    - patches/fix-malformed-input-followups.patch
     - if: win or osx
       then: patches/mingw_time.patch
     - if: win
