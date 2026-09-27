@@ -45,6 +45,11 @@ source:
     # axisymmetric node reaches the mean rotation code, which sets its loop
     # bounds only for shells and beams; FreeCAD/FreeCAD#10865
     - patches/fix-2d-rotational-dofs.patch
+    # calls that pass fewer arguments than the callee declares, found by
+    # compiling every Fortran unit as one file: the callee dereferences
+    # whatever follows the last argument actually passed
+    - patches/fix-missing-ier-arguments.patch
+    - patches/fix-extrapolate-se-beam-sections.patch
     - if: win or osx
       then: patches/mingw_time.patch
     - if: win
@@ -108,6 +113,7 @@ tests:
         - cfd.dat.ref
         - axirot.inp
         - axirotload.inp
+        - hcfnoinput.inp
     requirements:
       run:
         - python
