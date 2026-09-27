@@ -58,13 +58,16 @@ source:
     - patches/fix-electromagnetics-ithermal-array.patch
     - patches/fix-cd-lab-correction-edges.patch
     - patches/fix-calinput-cs-guard.patch
+    # calls whose arguments do not line up with the routine called, found by
+    # checking every call against its callee
+    - patches/fix-flux-rcavi-physcon.patch
     - if: win or osx
       then: patches/mingw_time.patch
     - if: win
       then: patches/fix-win-locale.patch
 
 build:
-  number: 7
+  number: 8
 
 requirements:
   build:
