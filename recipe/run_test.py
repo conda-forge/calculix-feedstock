@@ -45,6 +45,12 @@ bleedtap.inp is a gas network bleed tapping: orifice.f passed its curve
 number to cd_bleedtapping.f as a real*8 where an integer is read, so no
 curve was used and printing the element summary stopped ccx.
 
+contact.inp is also run with its contact made LINEAR and, as the same
+straight line, TABULAR: springforc_f2f.f and springstiff_f2f.f passed an
+82-entry plconloc to materialdata_sp.f, which writes entries 801 and 802,
+and read the curve length from entry 81, so every face-to-face model with a
+tabular pressure-overclosure crashed or failed to converge.
+
 hcfnoinput.inp is an *HCF card without INPUT=.  hcfs.f called inputerror.f
 without its ier argument, so reporting the error stored through a bogus
 pointer and ccx segfaulted; it has to exit with the error message.
@@ -293,5 +299,27 @@ if curve != "1" or abs(dab - (1 - p2p1) / (1 - ps1pt1)) > 1.0e-3 * dab:
 expected_cd = 0.167 + (0.310 - 0.167) * (dab - 0.24) / (0.52 - 0.24)
 if not 0.24 < dab < 0.52 or abs(cd - expected_cd) > 1.0e-3 * expected_cd:
     sys.exit(f"bleedtap: cd {cd!r}, expected {expected_cd!r} at DAB {dab!r}:\n{net}")
+
+# 11. face-to-face contact with a tabular pressure-overclosure curve has to
+#     give what the same straight line gives as PRESSURE-OVERCLOSURE=LINEAR
+with open("contact.inp") as handle:
+    contact = handle.read()
+hard = "*SURFACE BEHAVIOR,PRESSURE-OVERCLOSURE=HARD\n**1.E7,1.\n"
+if hard not in contact:
+    sys.exit("contact.inp no longer has the contact definition this test edits")
+with open("contactlin.inp", "w") as handle:
+    handle.write(contact.replace(
+        hard, "*SURFACE BEHAVIOR,PRESSURE-OVERCLOSURE=LINEAR\n1.E7,1.E-3\n"))
+with open("contacttab.inp", "w") as handle:
+    # pressure, overclosure
+    handle.write(contact.replace(
+        hard, "*SURFACE BEHAVIOR,PRESSURE-OVERCLOSURE=TABULAR\n0.,0.\n1.E7,1.\n"))
+linear, _ = run("contactlin")
+tabular, _ = run("contacttab")
+got = [float(v) for v in NUMBER.findall(tabular)]
+want = [float(v) for v in NUMBER.findall(linear)]
+scale = CONTACT_TOLERANCE * max(abs(v) for v in want)
+if len(got) != len(want) or any(abs(a - b) > scale for a, b in zip(got, want)):
+    sys.exit(f"tabular overclosure differs from linear:\n{tabular}\nlinear:\n{linear}")
 
 print("CalculiX tests passed")
