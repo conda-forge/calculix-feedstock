@@ -19,7 +19,7 @@
 # AddressSanitizer, and by review of the code around each crash.
 
 diff --git a/ccx_2.23/src/allocation.f b/ccx_2.23/src/allocation.f
-index 18ccea8..e0c6297 100644
+index f696005..9c801d7 100644
 --- a/ccx_2.23/src/allocation.f
 +++ b/ccx_2.23/src/allocation.f
 @@ -378,6 +378,13 @@
@@ -36,7 +36,7 @@ index 18ccea8..e0c6297 100644
        elseif(textpart(1)(1:11).eq.'*CONSTRAINT') then
          do
            call getnewline(inpc,textpart,istat,n,key,iline,ipol,inl,
-@@ -871,7 +878,9 @@ c          endif
+@@ -872,7 +879,9 @@ c          endif
       &           inl,ipoinp,inp,ipoinpc)
              if((istat.lt.0).or.(key.eq.1)) exit
              ntmatl=ntmatl+1
@@ -47,7 +47,7 @@ index 18ccea8..e0c6297 100644
            enddo
            ntmat_=max(ntmatl,ntmat_)
          elseif(ityp.eq.21) then
-@@ -880,7 +889,12 @@ c          endif
+@@ -881,7 +890,12 @@ c          endif
       &           inl,ipoinp,inp,ipoinpc)
              if((istat.lt.0).or.(key.eq.1)) exit
              ntmatl=ntmatl+1
@@ -61,7 +61,7 @@ index 18ccea8..e0c6297 100644
            enddo
            ntmat_=max(ntmatl,ntmat_)
          endif
-@@ -1507,7 +1521,9 @@ c            nmpc_=nmpc_+3
+@@ -1508,7 +1522,9 @@ c            nmpc_=nmpc_+3
              if((istat.lt.0).or.(key.eq.1)) exit
              ntmatl=ntmatl+1
              ntmat_=max(ntmatl,ntmat_)
@@ -72,7 +72,7 @@ index 18ccea8..e0c6297 100644
            enddo
          endif
        elseif(textpart(1)(1:10).eq.'*HYPERFOAM') then
-@@ -1541,7 +1557,9 @@ c            nmpc_=nmpc_+3
+@@ -1542,7 +1558,9 @@ c            nmpc_=nmpc_+3
              if((istat.lt.0).or.(key.eq.1)) exit
              ntmatl=ntmatl+1
              ntmat_=max(ntmatl,ntmat_)

@@ -11,10 +11,25 @@
 #   - initialconditionss: check element nodes before evaluating sigini
 #   - calinput: stop when no element was defined
 #   - elementcpuload: give one empty range when no element is active
+#   - allocation: initialise nconstants for *DAMAGE INITIATION
+#   - films: reject a non-positive element number on *FILM
+#   - radiates: reject a non-positive element number on *RADIATE
 #
 # Found by fuzzing ccx with malformed variants of 518 input decks under
 # AddressSanitizer, and by review of the code around each crash.
 
+diff --git a/ccx_2.23/src/allocation.f b/ccx_2.23/src/allocation.f
+index 18ccea8..f696005 100644
+--- a/ccx_2.23/src/allocation.f
++++ b/ccx_2.23/src/allocation.f
+@@ -516,6 +516,7 @@
+         enddo
+       elseif(textpart(1)(1:17).eq.'*DAMAGEINITIATION') then
+         ntmatl=0
++        nconstants=0
+ !
+         do i=2,n
+           if(textpart(i)(1:10).eq.'CRITERION=') then
 diff --git a/ccx_2.23/src/calinput.f b/ccx_2.23/src/calinput.f
 index e7b74d1..1fdbfe4 100644
 --- a/ccx_2.23/src/calinput.f
@@ -168,6 +183,19 @@ index 32897aa..2a6d3df 100644
      if(nepar<*num_cpus) *num_cpus=nepar;
  
      /* dividing the element number range into num_cpus equal numbers of 
+diff --git a/ccx_2.23/src/films.f b/ccx_2.23/src/films.f
+index c4f1797..4522098 100644
+--- a/ccx_2.23/src/films.f
++++ b/ccx_2.23/src/films.f
+@@ -270,7 +270,7 @@ c     call reorderampl(amname,namta,nam)
+ !     
+         read(textpart(1)(1:10),'(i10)',iostat=istat) l
+         if(istat.eq.0) then
+-          if(l.gt.ne) then
++          if((l.gt.ne).or.(l.lt.1)) then
+             write(*,*) '*ERROR reading *FILM: element ',l
+             write(*,*) '       is not defined'
+             ier=1
 diff --git a/ccx_2.23/src/initialconditionss.f b/ccx_2.23/src/initialconditionss.f
 index a58303a..ea06535 100644
 --- a/ccx_2.23/src/initialconditionss.f
@@ -207,6 +235,19 @@ index 2748375..e48a492 100644
        iperturb(1)=3
  !     
        do i=2,n
+diff --git a/ccx_2.23/src/radiates.f b/ccx_2.23/src/radiates.f
+index 82f6f39..f7c0812 100644
+--- a/ccx_2.23/src/radiates.f
++++ b/ccx_2.23/src/radiates.f
+@@ -296,7 +296,7 @@ c     call reorderampl(amname,namta,nam)
+ !     
+         read(textpart(1)(1:10),'(i10)',iostat=istat) l
+         if(istat.eq.0) then
+-          if(l.gt.ne) then
++          if((l.gt.ne).or.(l.lt.1)) then
+             write(*,*) '*ERROR reading *RADIATE: element ',l
+             write(*,*) '       is not defined'
+             ier=1
 diff --git a/ccx_2.23/src/userelements.f b/ccx_2.23/src/userelements.f
 index 2fe3cb7..c06eb6a 100644
 --- a/ccx_2.23/src/userelements.f
