@@ -58,13 +58,35 @@ source:
     - patches/fix-electromagnetics-ithermal-array.patch
     - patches/fix-cd-lab-correction-edges.patch
     - patches/fix-calinput-cs-guard.patch
+    # calls whose arguments do not line up with the routine called, found by
+    # checking every call against its callee
+    - patches/fix-flux-rcavi-physcon.patch
+    - patches/fix-orifice-curve-integer.patch
+    # face-to-face contact with PRESSURE-OVERCLOSURE=TABULAR used the old
+    # 82-entry layout of plconloc that materialdata_sp.f no longer fills
+    - patches/fix-f2f-tabular-overclosure.patch
+    # found by AddressSanitizer on FreeCAD's ccx_1D_fluid_network example
+    - patches/fix-preinitialnet-inlet-neighbor.patch
+    # crashes, hangs and silent out-of-bounds accesses on malformed input,
+    # found by fuzzing 518 decks under AddressSanitizer; each such input now
+    # ends in an *ERROR and exit code 201
+    - patches/fix-malformed-input-nodes-elements.patch
+    - patches/fix-malformed-input-sets-sections.patch
+    - patches/fix-malformed-input-fluid.patch
+    - patches/fix-malformed-input-materials.patch
+    - patches/fix-malformed-input-parsing.patch
+    # two fluid network loops that test the wrong element; these change
+    # results for valid models
+    - patches/fix-fluid-network-labels.patch
+    - patches/fix-malformed-input-misc.patch
+    - patches/fix-malformed-input-followups.patch
     - if: win or osx
       then: patches/mingw_time.patch
     - if: win
       then: patches/fix-win-locale.patch
 
 build:
-  number: 7
+  number: 8
 
 requirements:
   build:
@@ -122,6 +144,7 @@ tests:
         - axirot.inp
         - axirotload.inp
         - hcfnoinput.inp
+        - bleedtap.inp
     requirements:
       run:
         - python

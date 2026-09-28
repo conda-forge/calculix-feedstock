@@ -41,6 +41,23 @@ nothing.  So it has to say it ignored the SPCs, and get the closed-form
 answer.  axirotload.inp puts a moment on a node, which crashes unpatched ccx
 on macOS as built; it has to stop with an error instead.
 
+bleedtap.inp is a gas network bleed tapping: orifice.f passed its curve
+number to cd_bleedtapping.f as a real*8 where an integer is read, so no
+curve was used and printing the element summary stopped ccx.
+
+contact.inp is also run with its contact made LINEAR and, as the same
+straight line, TABULAR: springforc_f2f.f and springstiff_f2f.f passed an
+82-entry plconloc to materialdata_sp.f, which writes entries 801 and 802,
+and read the curve length from entry 81, so every face-to-face model with a
+tabular pressure-overclosure crashed or failed to converge.
+
+Last, smoketest.inp is broken in seven ways a hand-edited deck can be --
+element nodes that are 0 or undefined, no *NODE card, node number 0,
+*END STEP without *STEP, a section on undefined elements, a negative
+degree of freedom -- and every one has to be rejected with an *ERROR and
+exit code 201.  Fuzzing such variants of 518 decks found 71 places where
+ccx instead crashed, hung or silently worked on memory it did not own.
+
 hcfnoinput.inp is an *HCF card without INPUT=.  hcfs.f called inputerror.f
 without its ier argument, so reporting the error stored through a bogus
 pointer and ccx segfaulted; it has to exit with the error message.
@@ -269,5 +286,89 @@ if completed.returncode != 201 or "no input file specified" not in completed.std
         f"ccx hcfnoinput exited {completed.returncode}; expected 201 and"
         f" \"no input file specified\":\n{completed.stdout}"
     )
+
+# 10. a bleed tapping has to use the discharge curve it was given
+run("bleedtap")
+with open("bleedtap.net") as handle:
+    net = handle.read()
+summary = re.search(
+    r"P2/P1 =\s*(\S+) , ps1pt1 =\s*(\S+) , DAB =\s*(\S+) , curve No =\s*(\d+)"
+    r" , cd =\s*(\S+)",
+    net,
+)
+if summary is None:
+    sys.exit(f"bleedtap.net has no bleed tapping summary:\n{net}")
+p2p1, ps1pt1, dab, curve, cd = summary.groups()
+p2p1, ps1pt1, dab, cd = (float(v) for v in (p2p1, ps1pt1, dab, cd))
+# the summary prints four significant digits
+if curve != "1" or abs(dab - (1 - p2p1) / (1 - ps1pt1)) > 1.0e-3 * dab:
+    sys.exit(f"bleedtap: curve {curve}, DAB {dab!r} from P2/P1 {p2p1!r}:\n{net}")
+expected_cd = 0.167 + (0.310 - 0.167) * (dab - 0.24) / (0.52 - 0.24)
+if not 0.24 < dab < 0.52 or abs(cd - expected_cd) > 1.0e-3 * expected_cd:
+    sys.exit(f"bleedtap: cd {cd!r}, expected {expected_cd!r} at DAB {dab!r}:\n{net}")
+
+# 11. face-to-face contact with a tabular pressure-overclosure curve has to
+#     give what the same straight line gives as PRESSURE-OVERCLOSURE=LINEAR
+with open("contact.inp") as handle:
+    contact = handle.read()
+hard = "*SURFACE BEHAVIOR,PRESSURE-OVERCLOSURE=HARD\n**1.E7,1.\n"
+if hard not in contact:
+    sys.exit("contact.inp no longer has the contact definition this test edits")
+with open("contactlin.inp", "w") as handle:
+    handle.write(contact.replace(
+        hard, "*SURFACE BEHAVIOR,PRESSURE-OVERCLOSURE=LINEAR\n1.E7,1.E-3\n"))
+with open("contacttab.inp", "w") as handle:
+    # pressure, overclosure
+    handle.write(contact.replace(
+        hard, "*SURFACE BEHAVIOR,PRESSURE-OVERCLOSURE=TABULAR\n0.,0.\n1.E7,1.\n"))
+linear, _ = run("contactlin")
+tabular, _ = run("contacttab")
+got = [float(v) for v in NUMBER.findall(tabular)]
+want = [float(v) for v in NUMBER.findall(linear)]
+scale = CONTACT_TOLERANCE * max(abs(v) for v in want)
+if len(got) != len(want) or any(abs(a - b) > scale for a, b in zip(got, want)):
+    sys.exit(f"tabular overclosure differs from linear:\n{tabular}\nlinear:\n{linear}")
+
+# 12. malformed input has to be rejected with an *ERROR, not crash or run
+with open("smoketest.inp") as handle:
+    smoke = handle.read()
+first_node, element = "8,   0., 100., 100.", "1, 1, 2, 3, 4, 5, 6, 7, 8"
+section = "*SOLID SECTION, ELSET=Eall"
+if first_node not in smoke or element not in smoke or section not in smoke:
+    sys.exit("smoketest.inp no longer has the lines test 12 edits")
+malformed = {
+    # an element node that is 0, or beyond every defined node
+    "badnode0": smoke.replace(element, "1, 1, 2, 3, 4, 5, 6, 7, 0"),
+    "badnode99": smoke.replace(element, "1, 1, 2, 3, 4, 5, 6, 7, 99"),
+    # no *NODE card at all
+    "badnonode": smoke[:smoke.index("*NODE")] + smoke[smoke.index("*ELEMENT"):],
+    # a *NODE line with node number 0
+    "badnodenum": smoke.replace(first_node, "0,   0., 100., 100."),
+    # *END STEP without *STEP
+    "badnostep": smoke.replace("*STEP\n", ""),
+    # a section on a set with elements that do not exist
+    "badelset": smoke.replace(section, "*ELSET, ELSET=Ebad\n1, 5\n" + section[:-4] + "Ebad"),
+    # a negative degree of freedom
+    "baddof": smoke.replace("Nfix, 3, 3, 0.", "Nfix, -3, 3, 0."),
+}
+for name, deck in malformed.items():
+    with open(name + ".inp", "w") as handle:
+        handle.write(deck)
+    try:
+        completed = subprocess.run(
+            [ccx, name],
+            env=dict(os.environ, OMP_NUM_THREADS="1"),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            timeout=300,
+        )
+    except subprocess.TimeoutExpired:
+        sys.exit(f"ccx {name} did not finish in 300 s on malformed input")
+    if completed.returncode != 201 or "*ERROR" not in completed.stdout:
+        sys.exit(
+            f"ccx {name} exited {completed.returncode} on malformed input;"
+            f" expected 201 and an *ERROR:\n{completed.stdout}"
+        )
 
 print("CalculiX tests passed")
