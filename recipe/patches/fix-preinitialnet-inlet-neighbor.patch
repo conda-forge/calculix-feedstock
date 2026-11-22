@@ -1,7 +1,7 @@
-diff --git a/ccx_2.23/src/networkneighbor.f b/ccx_2.23/src/networkneighbor.f
-index 5959dfc..499082e 100644
---- a/ccx_2.23/src/networkneighbor.f
-+++ b/ccx_2.23/src/networkneighbor.f
+diff --git a/ccx_2.24/src/networkneighbor.f b/ccx_2.24/src/networkneighbor.f
+index bef16bd..8c380d4 100644
+--- a/ccx_2.24/src/networkneighbor.f
++++ b/ccx_2.24/src/networkneighbor.f
 @@ -29,6 +29,7 @@
       &  iponoeln(*),inoeln(2,*),ipkon(*),kon(*),iel
  !
@@ -10,10 +10,10 @@ index 5959dfc..499082e 100644
        ibranch=0
  !
        index=iponoeln(node)
-diff --git a/ccx_2.23/src/preinitialnet.f b/ccx_2.23/src/preinitialnet.f
-index 451de57..1c58bdd 100644
---- a/ccx_2.23/src/preinitialnet.f
-+++ b/ccx_2.23/src/preinitialnet.f
+diff --git a/ccx_2.24/src/preinitialnet.f b/ccx_2.24/src/preinitialnet.f
+index 3587bfc..24d9075 100644
+--- a/ccx_2.24/src/preinitialnet.f
++++ b/ccx_2.24/src/preinitialnet.f
 @@ -320,29 +320,41 @@
  !                 (for compressible and incompressible networks)
  !

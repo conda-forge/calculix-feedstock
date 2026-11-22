@@ -1,17 +1,8 @@
-# Initialise fluid section defaults; require *COUPLING SURFACE; stop on ARPACK failure in arpackcs
-#
-#   - fluidsections: initialise material and nconstants; reject unknown subtypes
-#   - couplings: require the SURFACE parameter on *COUPLING
-#   - arpackcs: stop when dnaupd/dsaupd fail, as arpack does
-#
-# Found by fuzzing ccx with malformed variants of 518 input decks under
-# AddressSanitizer, and by review of the code around each crash.
-
-diff --git a/ccx_2.23/src/arpackcs.c b/ccx_2.23/src/arpackcs.c
-index 074f4f1..270afc7 100644
---- a/ccx_2.23/src/arpackcs.c
-+++ b/ccx_2.23/src/arpackcs.c
-@@ -900,6 +900,7 @@ void arpackcs(double *co, ITG *nk, ITG **konp, ITG **ipkonp, char **lakonp,
+diff --git a/ccx_2.24/src/arpackcs.c b/ccx_2.24/src/arpackcs.c
+index fafff84..07d1f21 100644
+--- a/ccx_2.24/src/arpackcs.c
++++ b/ccx_2.24/src/arpackcs.c
+@@ -913,6 +913,7 @@ void arpackcs(double *co, ITG *nk, ITG **konp, ITG **ipkonp, char **lakonp,
        if(info!=0){
  	printf(" *ERROR in d[n,s]aupd: info=%" ITGFORMAT "\n",info);
  	printf("       # of converged eigenvalues=%" ITGFORMAT "\n\n",iparam[4]);
@@ -19,10 +10,10 @@ index 074f4f1..270afc7 100644
        }         
  	
        NNEW(temp_array2,double,nev);
-diff --git a/ccx_2.23/src/couplings.f b/ccx_2.23/src/couplings.f
-index 7737fab..f9d9217 100644
---- a/ccx_2.23/src/couplings.f
-+++ b/ccx_2.23/src/couplings.f
+diff --git a/ccx_2.24/src/couplings.f b/ccx_2.24/src/couplings.f
+index 06cf65e..58eccc4 100644
+--- a/ccx_2.24/src/couplings.f
++++ b/ccx_2.24/src/couplings.f
 @@ -109,6 +109,7 @@
  !     
        name(1:1)=' '
@@ -30,8 +21,8 @@ index 7737fab..f9d9217 100644
 +      jsurf=0
        do i=2,n
          if(textpart(i)(1:8).eq.'REFNODE=') then
-           read(textpart(i)(9:18),'(i10)',iostat=istat) irefnode
-@@ -186,6 +187,15 @@
+            read(textpart(i)(9:18),'(i10)',iostat=istat) irefnode
+@@ -209,6 +210,15 @@
       &       "*COUPLING%",ier)
          return
        endif
@@ -47,10 +38,10 @@ index 7737fab..f9d9217 100644
  !     
        if(orientation.eq.'                    ') then
          iorientation=0
-diff --git a/ccx_2.23/src/fluidsections.f b/ccx_2.23/src/fluidsections.f
-index cc63f51..5946d29 100644
---- a/ccx_2.23/src/fluidsections.f
-+++ b/ccx_2.23/src/fluidsections.f
+diff --git a/ccx_2.24/src/fluidsections.f b/ccx_2.24/src/fluidsections.f
+index e697a7b..ad73908 100644
+--- a/ccx_2.24/src/fluidsections.f
++++ b/ccx_2.24/src/fluidsections.f
 @@ -58,6 +58,8 @@
        typename='
       &'

@@ -1,7 +1,7 @@
-diff --git a/ccx_2.23/src/flux.f b/ccx_2.23/src/flux.f
-index 1ff8643..0fdcbad 100644
---- a/ccx_2.23/src/flux.f
-+++ b/ccx_2.23/src/flux.f
+diff --git a/ccx_2.24/src/flux.f b/ccx_2.24/src/flux.f
+index 053fc48..ae032a0 100644
+--- a/ccx_2.24/src/flux.f
++++ b/ccx_2.24/src/flux.f
 @@ -215,7 +215,7 @@
  !
           call rcavi(node1,node2,nodem,nelem,lakon,kon,ipkon,

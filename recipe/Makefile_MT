@@ -88,5 +88,11 @@ LIBS = \
 ccx_$(VERSION)_conda: $(OCCXMAIN) ccx_$(VERSION)_conda.a
 	$(FC) $(FFLAGS) -o $@ $(OCCXMAIN) ccx_$(VERSION)_conda.a $(LDFLAGS) -larpack -llapack -lblas $(LIBS)
 
-ccx_$(VERSION)_conda.a: $(OCCXF) $(OCCXC)
+ccx_$(VERSION)_conda.a: $(OCCXF) $(OCCXC) buildinfo.o
 	$(AR) vr $@ $?
+
+# 2.24 puts the compile time in buildinfo.c instead of stamping it into the
+# sources.  It is not part of $(SCCXC) because it has to be recompiled
+# whenever any other object file changes, so upstream's Makefile and
+# Makefile_MT depend on it separately as well.
+buildinfo.o: $(OCCXMAIN) $(OCCXF) $(OCCXC)

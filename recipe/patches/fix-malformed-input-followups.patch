@@ -1,18 +1,7 @@
-# Require ELSET on section cards; reject load node 0; bound two iterations; guard *COUPLING
-#
-#   - Section and discrete element cards: require the ELSET parameter
-#   - cloads, cfluxs: reject node numbers below 1
-#   - hnorm, friction_coefficient: stop after 1000 iterations
-#   - membranesections: keep the ELSET error message within column 72
-#   - couplings: skip face nodes of an element whose definition failed
-#
-# Found by fuzzing ccx with malformed variants of 518 input decks under
-# AddressSanitizer, and by review of the code around each crash.
-
-diff --git a/ccx_2.23/src/beamgeneralsections.f b/ccx_2.23/src/beamgeneralsections.f
-index 222eb56..a77d73e 100644
---- a/ccx_2.23/src/beamgeneralsections.f
-+++ b/ccx_2.23/src/beamgeneralsections.f
+diff --git a/ccx_2.24/src/beamgeneralsections.f b/ccx_2.24/src/beamgeneralsections.f
+index 3b0bfb6..be93749 100644
+--- a/ccx_2.24/src/beamgeneralsections.f
++++ b/ccx_2.24/src/beamgeneralsections.f
 @@ -63,6 +63,7 @@
        ipos=1
        npropstart=nprop
@@ -21,7 +10,7 @@ index 222eb56..a77d73e 100644
        do i=2,n
          if(textpart(i)(1:9).eq.'MATERIAL=') then
            material=textpart(i)(10:89)
-@@ -164,6 +165,13 @@ c     iorientation=0
+@@ -173,6 +174,13 @@ c     iorientation=0
  c     do i=1,nset
  c     if(set(i).eq.elset) exit
  c     enddo
@@ -35,37 +24,11 @@ index 222eb56..a77d73e 100644
        call cident81(set,elset,nset,id)
        i=nset+1
        if(id.gt.0) then
-diff --git a/ccx_2.23/src/cfluxs.f b/ccx_2.23/src/cfluxs.f
-index 0c063b4..e896d83 100644
---- a/ccx_2.23/src/cfluxs.f
-+++ b/ccx_2.23/src/cfluxs.f
-@@ -187,7 +187,7 @@ c            call reorderampl(amname,namta,nam)
- !
-          read(textpart(1)(1:10),'(i10)',iostat=istat) l
-          if(istat.eq.0) then
--            if(l.gt.nk) then
-+            if((l.gt.nk).or.(l.lt.1)) then
-                write(*,*) '*ERROR reading *CFLUX: node ',l
-                write(*,*) '       is not defined'
-                ier=1
-diff --git a/ccx_2.23/src/cloads.f b/ccx_2.23/src/cloads.f
-index 8d4bb24..77e20bb 100644
---- a/ccx_2.23/src/cloads.f
-+++ b/ccx_2.23/src/cloads.f
-@@ -280,7 +280,7 @@
- !     
-         read(textpart(1)(1:10),'(i10)',iostat=istat) l
-         if(istat.eq.0) then
--          if(l.gt.nk) then
-+          if((l.gt.nk).or.(l.lt.1)) then
-             write(*,*) '*ERROR reading *CLOAD: node ',l
-             write(*,*) '       is not defined'
-             ier=1
-diff --git a/ccx_2.23/src/couplings.f b/ccx_2.23/src/couplings.f
-index f9d9217..28fefdc 100644
---- a/ccx_2.23/src/couplings.f
-+++ b/ccx_2.23/src/couplings.f
-@@ -284,6 +284,11 @@
+diff --git a/ccx_2.24/src/couplings.f b/ccx_2.24/src/couplings.f
+index 58eccc4..e6db947 100644
+--- a/ccx_2.24/src/couplings.f
++++ b/ccx_2.24/src/couplings.f
+@@ -307,6 +307,11 @@
                else
                  node =ialset(j)
                endif
@@ -77,7 +40,7 @@ index f9d9217..28fefdc 100644
  !     
                call nident2(ics,node,npt,id)
                if(id.gt.0) then
-@@ -593,6 +598,14 @@
+@@ -616,6 +621,14 @@
                nodef(i)=kon(indexe+ifaceq(i,jface))
              enddo
            endif
@@ -92,10 +55,10 @@ index f9d9217..28fefdc 100644
  !     
  !     loop over the nodes belonging to the face   
  !     ics(1,*): surface node
-diff --git a/ccx_2.23/src/dashpots.f b/ccx_2.23/src/dashpots.f
-index 6821dcc..33dfd5a 100644
---- a/ccx_2.23/src/dashpots.f
-+++ b/ccx_2.23/src/dashpots.f
+diff --git a/ccx_2.24/src/dashpots.f b/ccx_2.24/src/dashpots.f
+index 0a3744c..1250888 100644
+--- a/ccx_2.24/src/dashpots.f
++++ b/ccx_2.24/src/dashpots.f
 @@ -65,6 +65,7 @@
           matname(nmat)(i:i)=' '
        enddo
@@ -118,10 +81,10 @@ index 6821dcc..33dfd5a 100644
        call cident81(set,elset,nset,id)
        i=nset+1
        if(id.gt.0) then
-diff --git a/ccx_2.23/src/friction_coefficient.f b/ccx_2.23/src/friction_coefficient.f
-index fdef996..e0b14b7 100644
---- a/ccx_2.23/src/friction_coefficient.f
-+++ b/ccx_2.23/src/friction_coefficient.f
+diff --git a/ccx_2.24/src/friction_coefficient.f b/ccx_2.24/src/friction_coefficient.f
+index 2f22ec7..d0869e2 100644
+--- a/ccx_2.24/src/friction_coefficient.f
++++ b/ccx_2.24/src/friction_coefficient.f
 @@ -38,6 +38,8 @@
  !     lambda: friction coefficient
  !      
@@ -165,10 +128,10 @@ index fdef996..e0b14b7 100644
              ds=dsqrt(friction)
              dd=2.51d0/(reynolds*ds)+0.27d0*ksd
              dfriction=(1.d0/ds+2.d0*dlog10(dd))*2.d0*friction*ds/
-diff --git a/ccx_2.23/src/gaps.f b/ccx_2.23/src/gaps.f
-index f7a78da..7b32b3f 100644
---- a/ccx_2.23/src/gaps.f
-+++ b/ccx_2.23/src/gaps.f
+diff --git a/ccx_2.24/src/gaps.f b/ccx_2.24/src/gaps.f
+index 0536a14..8210c52 100644
+--- a/ccx_2.24/src/gaps.f
++++ b/ccx_2.24/src/gaps.f
 @@ -60,6 +60,7 @@
           matname(nmat)(i:i)=' '
        enddo
@@ -191,10 +154,10 @@ index f7a78da..7b32b3f 100644
        call cident81(set,elset,nset,id)
        i=nset+1
        if(id.gt.0) then
-diff --git a/ccx_2.23/src/hnorm.f b/ccx_2.23/src/hnorm.f
-index 829e133..b19c9bd 100644
---- a/ccx_2.23/src/hnorm.f
-+++ b/ccx_2.23/src/hnorm.f
+diff --git a/ccx_2.24/src/hnorm.f b/ccx_2.24/src/hnorm.f
+index 55bca42..b8bbdb3 100644
+--- a/ccx_2.24/src/hnorm.f
++++ b/ccx_2.24/src/hnorm.f
 @@ -39,6 +39,8 @@
  !     he:        normal depth
  !
@@ -236,10 +199,10 @@ index 829e133..b19c9bd 100644
            henew=c1*(b+2d0*he*cthi)**fourtenth/(b+he*tth)
            if(dabs(henew-he).lt.1.d-3*he) exit
            he=henew
-diff --git a/ccx_2.23/src/masss.f b/ccx_2.23/src/masss.f
-index c50ccb5..1d10083 100644
---- a/ccx_2.23/src/masss.f
-+++ b/ccx_2.23/src/masss.f
+diff --git a/ccx_2.24/src/masss.f b/ccx_2.24/src/masss.f
+index 925dbd6..5973717 100644
+--- a/ccx_2.24/src/masss.f
++++ b/ccx_2.24/src/masss.f
 @@ -58,6 +58,7 @@
           matname(nmat)(i:i)=' '
        enddo
@@ -262,10 +225,10 @@ index c50ccb5..1d10083 100644
        call cident81(set,elset,nset,id)
        i=nset+1
        if(id.gt.0) then
-diff --git a/ccx_2.23/src/membranesections.f b/ccx_2.23/src/membranesections.f
-index ca43326..eb58576 100644
---- a/ccx_2.23/src/membranesections.f
-+++ b/ccx_2.23/src/membranesections.f
+diff --git a/ccx_2.24/src/membranesections.f b/ccx_2.24/src/membranesections.f
+index db8701e..366fbbd 100644
+--- a/ccx_2.24/src/membranesections.f
++++ b/ccx_2.24/src/membranesections.f
 @@ -55,6 +55,7 @@
        material(1:1)=' '
        orientation(1:1)=' '
@@ -274,7 +237,7 @@ index ca43326..eb58576 100644
        do i=2,n
           if(textpart(i)(1:9).eq.'MATERIAL=') then
              material=textpart(i)(10:89)
-@@ -136,6 +137,14 @@ c         iorientation=0
+@@ -145,6 +146,14 @@ c         iorientation=0
  c      do i=1,nset
  c         if(set(i).eq.elset) exit
  c      enddo
@@ -289,10 +252,10 @@ index ca43326..eb58576 100644
        call cident81(set,elset,nset,id)
        i=nset+1
        if(id.gt.0) then
-diff --git a/ccx_2.23/src/shellsections.f b/ccx_2.23/src/shellsections.f
-index 4024f9c..f9efd20 100644
---- a/ccx_2.23/src/shellsections.f
-+++ b/ccx_2.23/src/shellsections.f
+diff --git a/ccx_2.24/src/shellsections.f b/ccx_2.24/src/shellsections.f
+index 789ff3f..72a151f 100644
+--- a/ccx_2.24/src/shellsections.f
++++ b/ccx_2.24/src/shellsections.f
 @@ -56,6 +56,7 @@
        material(1:1)=' '
        orientation(1:1)=' '
@@ -301,7 +264,7 @@ index 4024f9c..f9efd20 100644
        do i=2,n
          if(textpart(i)(1:9).eq.'MATERIAL=') then
            material=textpart(i)(10:89)
-@@ -131,6 +132,13 @@
+@@ -140,6 +141,13 @@
  c      do i=1,nset
  c        if(set(i).eq.elset) exit
  c      enddo
@@ -315,10 +278,10 @@ index 4024f9c..f9efd20 100644
        call cident81(set,elset,nset,id)
        i=nset+1
        if(id.gt.0) then
-diff --git a/ccx_2.23/src/springs.f b/ccx_2.23/src/springs.f
-index 123aa9a..19ed27b 100644
---- a/ccx_2.23/src/springs.f
-+++ b/ccx_2.23/src/springs.f
+diff --git a/ccx_2.24/src/springs.f b/ccx_2.24/src/springs.f
+index ada735b..5cd63a2 100644
+--- a/ccx_2.24/src/springs.f
++++ b/ccx_2.24/src/springs.f
 @@ -68,6 +68,7 @@
          matname(nmat)(i:i)=' '
        enddo
@@ -341,10 +304,10 @@ index 123aa9a..19ed27b 100644
        call cident81(set,elset,nset,id)
        i=nset+1
        if(id.gt.0) then
-diff --git a/ccx_2.23/src/usersections.f b/ccx_2.23/src/usersections.f
-index 4f4d0b2..0b4623f 100644
---- a/ccx_2.23/src/usersections.f
-+++ b/ccx_2.23/src/usersections.f
+diff --git a/ccx_2.24/src/usersections.f b/ccx_2.24/src/usersections.f
+index aa57962..7379812 100644
+--- a/ccx_2.24/src/usersections.f
++++ b/ccx_2.24/src/usersections.f
 @@ -50,6 +50,7 @@
  !     
        ndprop=0
@@ -353,7 +316,7 @@ index 4f4d0b2..0b4623f 100644
        do i=2,n
          if(textpart(i)(1:9).eq.'MATERIAL=') then
            material=textpart(i)(10:89)
-@@ -106,6 +107,13 @@
+@@ -115,6 +116,13 @@
  c      do i=1,nset
  c        if(set(i).eq.elset) exit
  c      enddo

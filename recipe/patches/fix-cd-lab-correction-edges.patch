@@ -1,7 +1,7 @@
-diff --git a/ccx_2.23/src/cd_lab_correction.f b/ccx_2.23/src/cd_lab_correction.f
-index 53cbba0..617a5a5 100644
---- a/ccx_2.23/src/cd_lab_correction.f
-+++ b/ccx_2.23/src/cd_lab_correction.f
+diff --git a/ccx_2.24/src/cd_lab_correction.f b/ccx_2.24/src/cd_lab_correction.f
+index dd87c0f..23b56bf 100644
+--- a/ccx_2.24/src/cd_lab_correction.f
++++ b/ccx_2.24/src/cd_lab_correction.f
 @@ -83,7 +83,8 @@
              else
                 cd_correction=cd_correction_tab(1,idy)

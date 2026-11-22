@@ -1,22 +1,8 @@
-# Reject malformed node and element input
-#
-#   - elements: reject nonpositive element numbers and undefined nodes
-#   - boundarys: reject negative degrees of freedom
-#   - expansions, electricalconductivitys: check nmat before using it
-#   - nodalthicknesss: require 1-D/2-D elements and defined nodes
-#   - pretensionsections: require the NODE parameter
-#   - refinemeshs: require a positive LIMIT
-#   - near3d: stop the search once all nodes have been visited
-#   - calinput: reject massless contact outside explicit dynamics
-#
-# Found by fuzzing ccx with malformed variants of 518 input decks under
-# AddressSanitizer, and by review of the code around each crash.
-
-diff --git a/ccx_2.23/src/boundarys.f b/ccx_2.23/src/boundarys.f
-index 9d75cbc..70e84f6 100644
---- a/ccx_2.23/src/boundarys.f
-+++ b/ccx_2.23/src/boundarys.f
-@@ -348,6 +348,14 @@
+diff --git a/ccx_2.24/src/boundarys.f b/ccx_2.24/src/boundarys.f
+index cbb88bd..6175013 100644
+--- a/ccx_2.24/src/boundarys.f
++++ b/ccx_2.24/src/boundarys.f
+@@ -375,6 +375,14 @@
                return
              endif
            endif
@@ -31,21 +17,11 @@ index 9d75cbc..70e84f6 100644
  !     
            if(textpart(4)(1:1).eq.' ') then
              bounval=0.d0
-diff --git a/ccx_2.23/src/calinput.f b/ccx_2.23/src/calinput.f
-index 0402eba..f27e88f 100644
---- a/ccx_2.23/src/calinput.f
-+++ b/ccx_2.23/src/calinput.f
-@@ -645,7 +645,8 @@ c
-      &       ne,ne_,set,istartset,iendset,ialset,nset,nset_,nalset,
-      &       nalset_,mi(1),ixfree,iponor,xnor,istep,istat,n,iline,
-      &       ipol,inl,ipoinp,inp,iaxial,ipoinpc,solid,
--     &       network,filab,nlabel,out3d,iuel,nuel_,ier,iparentel)
-+     &       network,filab,nlabel,out3d,iuel,nuel_,ier,iparentel,
-+     &       nk)
- !     
-       elseif((textpart(1)(1:7).eq.'*ELFILE').or.
-      &       (textpart(1)(1:14).eq.'*ELEMENTOUTPUT')) then
-@@ -897,7 +898,7 @@ c
+diff --git a/ccx_2.24/src/calinput.f b/ccx_2.24/src/calinput.f
+index 5775ff8..e87a573 100644
+--- a/ccx_2.24/src/calinput.f
++++ b/ccx_2.24/src/calinput.f
+@@ -897,7 +897,7 @@ c
        elseif(textpart(1)(1:15).eq.'*NODALTHICKNESS') then
          call nodalthicknesss(inpc,textpart,set,istartset,iendset,
       &       ialset,nset,thickn,nk,istep,istat,n,iline,ipol,inl,
@@ -54,7 +30,7 @@ index 0402eba..f27e88f 100644
  !     
        elseif((textpart(1)(1:5).eq.'*NODE').and.
       &       (textpart(1)(1:10).ne.'*NODEPRINT').and.
-@@ -1259,6 +1260,16 @@ c
+@@ -1260,6 +1260,16 @@ c
        endif
  !     
        enddo loop
@@ -71,24 +47,10 @@ index 0402eba..f27e88f 100644
  !     
        if(ier.ge.1) then
          write(*,*) '*ERROR in calinput: at least one fatal'
-diff --git a/ccx_2.23/src/calinput_rfn.f b/ccx_2.23/src/calinput_rfn.f
-index a84f67d..5927870 100644
---- a/ccx_2.23/src/calinput_rfn.f
-+++ b/ccx_2.23/src/calinput_rfn.f
-@@ -66,7 +66,8 @@
-      &         ne,ne_,set,istartset,iendset,ialset,nset,nset_,nalset,
-      &         nalset_,mi(1),ixfree,iponor,xnor,istep,istatrfn,n,iline,
-      &         ipol,inl,ipoinp,inp,iaxial,ipoinpc,solid,
--     &         network,filab,nlabel,out3d,iuel,nuel_,ier,iparentel)
-+     &         network,filab,nlabel,out3d,iuel,nuel_,ier,iparentel,
-+     &         nk)
- !     
-         elseif(textpart(1)(1:12).eq.'*MODELCHANGE') then
-           call modelchanges(inpc,textpart,tieset,istatrfn,n,iline,
-diff --git a/ccx_2.23/src/electricalconductivitys.f b/ccx_2.23/src/electricalconductivitys.f
-index 837151e..2da15c4 100644
---- a/ccx_2.23/src/electricalconductivitys.f
-+++ b/ccx_2.23/src/electricalconductivitys.f
+diff --git a/ccx_2.24/src/electricalconductivitys.f b/ccx_2.24/src/electricalconductivitys.f
+index 21aeab1..e9ff247 100644
+--- a/ccx_2.24/src/electricalconductivitys.f
++++ b/ccx_2.24/src/electricalconductivitys.f
 @@ -34,7 +34,6 @@
        real*8 alcon(0:6,ntmat_,*),alzero(*)
  !
@@ -106,70 +68,10 @@ index 837151e..2da15c4 100644
  !
        ityp=1
  !
-diff --git a/ccx_2.23/src/elements.f b/ccx_2.23/src/elements.f
-index 6f99c63..212122d 100644
---- a/ccx_2.23/src/elements.f
-+++ b/ccx_2.23/src/elements.f
-@@ -20,7 +20,7 @@
-      &     set,istartset,iendset,ialset,nset,nset_,nalset,nalset_,mi,
-      &     ixfree,iponor,xnor,istep,istat,n,iline,ipol,inl,ipoinp,inp,
-      &     iaxial,ipoinpc,solid,network,filab,nlabel,out3d,iuel,
--     &     nuel_,ier,iparentel)
-+     &     nuel_,ier,iparentel,nk)
- !     
- !     reading the input deck: *ELEMENT
- !     
-@@ -39,7 +39,8 @@
-      &     nteller,j,ipkon(*),nkon,nope,indexe,mi(*),ipos,indexy,ixfree,
-      &     iponor(2,*),nopeexp,iline,ipol,inl,ipoinp(2,*),inp(3,*),
-      &     iaxial,ipoinpc(0:*),nlabel,network,iuel(4,*),nuel_,
--     &     id,four,number,ndof,intpoints,ier,iparentel(*),iparent
-+     &     id,four,number,ndof,intpoints,ier,iparentel(*),iparent,
-+     &     nk,node
- !     
-       real*8 xnor(*)
- !     
-@@ -434,6 +435,13 @@ c     Bernhardi end
-         read(textpart(1)(1:10),'(i10)',iostat=istat) i
-         if(istat.gt.0) then
-           call inputerror(inpc,ipoinpc,iline,
-+     &         "*ELEMENT%",ier)
-+          return
-+        endif
-+        if(i.le.0) then
-+          write(*,*) '*ERROR reading *ELEMENT: element number',i
-+          write(*,*) '       must be positive'
-+          call inputerror(inpc,ipoinpc,iline,
-      &         "*ELEMENT%",ier)
-           return
-         endif
-@@ -496,6 +504,22 @@ c     Bernhardi end
-             if(nteller.eq.nope) exit
-           enddo
-         endif
-+!     
-+!     check whether the nodes of the element are defined; node 0
-+!     denotes the entry or exit of a network element
-+!     
-+        do j=1,nope
-+          node=kon(indexe+j)
-+          if((node.gt.0).and.(node.le.nk)) cycle
-+          if((node.eq.0).and.(j.ne.2).and.(label(1:1).eq.'D').and.
-+     &         (label(1:7).ne.'DCOUP3D')) cycle
-+          write(*,*) '*ERROR reading *ELEMENT: node',node
-+          write(*,*) '       of element',i,' is not defined'
-+          call inputerror(inpc,ipoinpc,iline,
-+     &         "*ELEMENT%",ier)
-+          return
-+        enddo
-+!     
-         ne=max(ne,i)
- !     
-         if(iparent.gt.0) iparentel(i)=iparent
-diff --git a/ccx_2.23/src/expansions.f b/ccx_2.23/src/expansions.f
-index eb20728..063ea63 100644
---- a/ccx_2.23/src/expansions.f
-+++ b/ccx_2.23/src/expansions.f
+diff --git a/ccx_2.24/src/expansions.f b/ccx_2.24/src/expansions.f
+index 17e0ffc..ce66c49 100644
+--- a/ccx_2.24/src/expansions.f
++++ b/ccx_2.24/src/expansions.f
 @@ -34,7 +34,6 @@
        real*8 alcon(0:6,ntmat_,*),alzero(*)
  !
@@ -187,10 +89,10 @@ index eb20728..063ea63 100644
  !
        ityp=1
  !
-diff --git a/ccx_2.23/src/near3d.f b/ccx_2.23/src/near3d.f
-index 82e9112..4304ec7 100644
---- a/ccx_2.23/src/near3d.f
-+++ b/ccx_2.23/src/near3d.f
+diff --git a/ccx_2.24/src/near3d.f b/ccx_2.24/src/near3d.f
+index 231c871..311968d 100644
+--- a/ccx_2.24/src/near3d.f
++++ b/ccx_2.24/src/near3d.f
 @@ -212,6 +212,11 @@ c         call dsort(c,idummy,eight,iflag)
              endif
           endif
@@ -203,10 +105,10 @@ index 82e9112..4304ec7 100644
  !
           i=i+1
  !
-diff --git a/ccx_2.23/src/nodalthicknesss.f b/ccx_2.23/src/nodalthicknesss.f
-index 396ce34..19d7572 100644
---- a/ccx_2.23/src/nodalthicknesss.f
-+++ b/ccx_2.23/src/nodalthicknesss.f
+diff --git a/ccx_2.24/src/nodalthicknesss.f b/ccx_2.24/src/nodalthicknesss.f
+index ccd2b70..eb53bb9 100644
+--- a/ccx_2.24/src/nodalthicknesss.f
++++ b/ccx_2.24/src/nodalthicknesss.f
 @@ -18,7 +18,7 @@
  !
        subroutine nodalthicknesss(inpc,textpart,set,istartset,iendset,
@@ -256,10 +158,10 @@ index 396ce34..19d7572 100644
              thickn(1,l)=thickness1
              thickn(2,l)=thickness2
           else
-diff --git a/ccx_2.23/src/pretensionsections.f b/ccx_2.23/src/pretensionsections.f
-index d76a1a3..e372d06 100644
---- a/ccx_2.23/src/pretensionsections.f
-+++ b/ccx_2.23/src/pretensionsections.f
+diff --git a/ccx_2.24/src/pretensionsections.f b/ccx_2.24/src/pretensionsections.f
+index 0f0859e..0348528 100644
+--- a/ccx_2.24/src/pretensionsections.f
++++ b/ccx_2.24/src/pretensionsections.f
 @@ -113,6 +113,7 @@
        endif
  !     
@@ -268,7 +170,7 @@ index d76a1a3..e372d06 100644
        do i=1,81
          surface(i:i)=' '
        enddo
-@@ -178,6 +179,17 @@
+@@ -234,6 +235,17 @@
          endif
        enddo
  !     
@@ -286,10 +188,10 @@ index d76a1a3..e372d06 100644
  !     checking whether the surface exists and is an element face
  !     surface
  !     
-diff --git a/ccx_2.23/src/refinemeshs.f b/ccx_2.23/src/refinemeshs.f
-index a4f5bbb..3dfcb1a 100644
---- a/ccx_2.23/src/refinemeshs.f
-+++ b/ccx_2.23/src/refinemeshs.f
+diff --git a/ccx_2.24/src/refinemeshs.f b/ccx_2.24/src/refinemeshs.f
+index 9edd393..103af84 100644
+--- a/ccx_2.24/src/refinemeshs.f
++++ b/ccx_2.24/src/refinemeshs.f
 @@ -32,6 +32,8 @@
  !     
        integer istep,istat,n,key,i,ii,ier,iline,ipol,inl,ipoinp(2,*),
@@ -299,7 +201,7 @@ index a4f5bbb..3dfcb1a 100644
  !     
        if(istep.lt.1) then
          write(*,*) 
-@@ -102,6 +104,20 @@
+@@ -104,6 +106,20 @@
            filab(48)(i:i)=' '
          enddo
        endif

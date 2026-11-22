@@ -1,17 +1,7 @@
-# Reject malformed sets, sections and steps
-#
-#   - noelsets: replace end value by ne, not nk; reject nonpositive GENERATE bounds
-#   - calinput: make *END STEP without a preceding *STEP a fatal error
-#   - solid/shell/beamsections: reject elements of the set that are not defined
-#   - nodes: reject a nonpositive node number on a *NODE data line
-#
-# Found by fuzzing ccx with malformed variants of 518 input decks under
-# AddressSanitizer, and by review of the code around each crash.
-
-diff --git a/ccx_2.23/src/beamsections.f b/ccx_2.23/src/beamsections.f
-index 1511253..0f65902 100644
---- a/ccx_2.23/src/beamsections.f
-+++ b/ccx_2.23/src/beamsections.f
+diff --git a/ccx_2.24/src/beamsections.f b/ccx_2.24/src/beamsections.f
+index 61191dd..43b12b0 100644
+--- a/ccx_2.24/src/beamsections.f
++++ b/ccx_2.24/src/beamsections.f
 @@ -20,7 +20,7 @@
       &  ialset,nset,ielmat,matname,nmat,ielorien,orname,norien,
       &  thicke,ipkon,iponor,xnor,ixfree,
@@ -30,7 +20,7 @@ index 1511253..0f65902 100644
  !
        real*8 thicke(mi(3),*),thickness1,thickness2,p(3),xnor(*),
       &  offset(2,*),offset1,offset2,dd
-@@ -165,6 +165,20 @@
+@@ -174,6 +174,20 @@
           return
        endif
  !
@@ -51,11 +41,11 @@ index 1511253..0f65902 100644
  !     assigning the elements of the set the appropriate material,
  !     orientation number, section and offset(s)
  !
-diff --git a/ccx_2.23/src/calinput.f b/ccx_2.23/src/calinput.f
-index f27e88f..aeebb1b 100644
---- a/ccx_2.23/src/calinput.f
-+++ b/ccx_2.23/src/calinput.f
-@@ -317,7 +317,7 @@
+diff --git a/ccx_2.24/src/calinput.f b/ccx_2.24/src/calinput.f
+index e87a573..a34c3e7 100644
+--- a/ccx_2.24/src/calinput.f
++++ b/ccx_2.24/src/calinput.f
+@@ -316,7 +316,7 @@
       &         ialset,nset,ielmat,matname,nmat,ielorien,orname,norien,
       &         thicke,ipkon,iponor,xnor,ixfree,
       &         offset,lakon,irstrt,istep,istat,n,iline,ipol,inl,
@@ -64,7 +54,7 @@ index f27e88f..aeebb1b 100644
          endif
  !     
        elseif(textpart(1)(1:10).eq.'*BOUNDARYF') then
-@@ -1066,14 +1066,14 @@ c
+@@ -1065,14 +1065,14 @@ c
       &       ialset,nset,ielmat,matname,nmat,ielorien,orname,
       &       norien,thicke,kon,ipkon,offset,irstrt,istep,istat,n,
       &       iline,ipol,inl,ipoinp,inp,lakon,iaxial,ipoinpc,mi,
@@ -112,44 +102,11 @@ index f27e88f..aeebb1b 100644
        endif
  !     
  !     reorganizing the input in field inpc
-diff --git a/ccx_2.23/src/nodes.f b/ccx_2.23/src/nodes.f
-index 3953aab..dfd5c30 100644
---- a/ccx_2.23/src/nodes.f
-+++ b/ccx_2.23/src/nodes.f
-@@ -131,6 +131,13 @@ ccc   to remove end
-         read(textpart(1)(1:10),'(i10)',iostat=istat) i
-         if(istat.gt.0) then
-           call inputerror(inpc,ipoinpc,iline,
-+     &         "*NODE%",ier)
-+          return
-+        endif
-+        if(i.le.0) then
-+          write(*,*) '*ERROR reading *NODE: node number ',i
-+          write(*,*) '       is not positive'
-+          call inputerror(inpc,ipoinpc,iline,
-      &         "*NODE%",ier)
-           return
-         endif
-diff --git a/ccx_2.23/src/noelsets.f b/ccx_2.23/src/noelsets.f
-index 6c53142..23f310c 100644
---- a/ccx_2.23/src/noelsets.f
-+++ b/ccx_2.23/src/noelsets.f
-@@ -214,6 +214,14 @@ ccc   to remove end
-               return
-             endif
-           enddo
-+          if((ialset(nalset+1).le.0).or.(ialset(nalset+2).le.0)) then
-+            write(*,*) 
-+     &           '*ERROR reading *NSET/ELSET: starting or end value in'
-+            write(*,*) '       set ',
-+     &           set(iset)(1:index(set(iset),' ')-2),' <=0'
-+            ier=1
-+            return
-+          endif
-           if(kode.eq.0) then
-             if(ialset(nalset+1).gt.nk) then
-               write(*,*) 
-@@ -250,7 +258,7 @@ ccc   to remove end
+diff --git a/ccx_2.24/src/noelsets.f b/ccx_2.24/src/noelsets.f
+index f3b8a4d..7d33ae4 100644
+--- a/ccx_2.24/src/noelsets.f
++++ b/ccx_2.24/src/noelsets.f
+@@ -247,7 +247,7 @@
                write(*,*) '         set ',
       &             set(iset)(1:index(set(iset),' ')-2),' > ne;'
                write(*,*) '         replaced by ne'
@@ -158,10 +115,10 @@ index 6c53142..23f310c 100644
              elseif(ialset(nalset+3).le.0) then
                write(*,*) '*ERROR reading *NSET/ELSET: increment in'
                write(*,*) '       set ',
-diff --git a/ccx_2.23/src/shellsections.f b/ccx_2.23/src/shellsections.f
-index 3d64ab3..4024f9c 100644
---- a/ccx_2.23/src/shellsections.f
-+++ b/ccx_2.23/src/shellsections.f
+diff --git a/ccx_2.24/src/shellsections.f b/ccx_2.24/src/shellsections.f
+index 2dc5058..789ff3f 100644
+--- a/ccx_2.24/src/shellsections.f
++++ b/ccx_2.24/src/shellsections.f
 @@ -19,7 +19,8 @@
        subroutine shellsections(inpc,textpart,set,istartset,iendset,
       &     ialset,nset,ielmat,matname,nmat,ielorien,orname,norien,
@@ -181,7 +138,7 @@ index 3d64ab3..4024f9c 100644
  !     
        real*8 thicke(mi(3),*),thickness,offset(2,*),offset1
  !     
-@@ -146,6 +147,20 @@ c      enddo
+@@ -155,6 +156,20 @@ c      enddo
          return
        endif
        iset=i
@@ -202,10 +159,10 @@ index 3d64ab3..4024f9c 100644
  !     
  c     if(.not.nodalthickness) then
        call getnewline(inpc,textpart,istat,n,key,iline,ipol,inl,
-diff --git a/ccx_2.23/src/solidsections.f b/ccx_2.23/src/solidsections.f
-index 0c5364e..18bbef2 100644
---- a/ccx_2.23/src/solidsections.f
-+++ b/ccx_2.23/src/solidsections.f
+diff --git a/ccx_2.24/src/solidsections.f b/ccx_2.24/src/solidsections.f
+index 2b70f15..e5a377a 100644
+--- a/ccx_2.24/src/solidsections.f
++++ b/ccx_2.24/src/solidsections.f
 @@ -20,7 +20,7 @@
       &  ialset,nset,ielmat,matname,nmat,ielorien,orname,norien,
       &  lakon,thicke,kon,ipkon,irstrt,istep,istat,n,iline,ipol,inl,
@@ -224,7 +181,7 @@ index 0c5364e..18bbef2 100644
  !
        real*8 thicke(mi(3),*),thickness,pi,cs(18,*),xn(3),co(3,*),p(3),
       &     dd,xnor(*),orab(7,*)
-@@ -154,6 +154,20 @@ c      enddo
+@@ -159,6 +159,20 @@ c      enddo
           return
        endif
  !

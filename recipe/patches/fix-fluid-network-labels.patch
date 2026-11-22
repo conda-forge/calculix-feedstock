@@ -1,15 +1,7 @@
-# Test the right element in two fluid network loops
-#
-#   - fluidsections: relabel the elements of a generated range, not lakon(-increment)
-#   - initialnet: test the branch element's own label, lakon(nelem)
-#
-# Found by fuzzing ccx with malformed variants of 518 input decks under
-# AddressSanitizer, and by review of the code around each crash.
-
-diff --git a/ccx_2.23/src/fluidsections.f b/ccx_2.23/src/fluidsections.f
-index 584148d..cc63f51 100644
---- a/ccx_2.23/src/fluidsections.f
-+++ b/ccx_2.23/src/fluidsections.f
+diff --git a/ccx_2.24/src/fluidsections.f b/ccx_2.24/src/fluidsections.f
+index 47d319b..e697a7b 100644
+--- a/ccx_2.24/src/fluidsections.f
++++ b/ccx_2.24/src/fluidsections.f
 @@ -912,26 +912,26 @@ c     enddo
  !     
  !     gas type elements used for liquids are labeled with LP
@@ -54,10 +46,10 @@ index 584148d..cc63f51 100644
                write(*,*) ''
                write(*,*)'*ERROR reading *FLUID SECTION: element ',k,
       &             ' is no valid incompressible orifice element.'
-diff --git a/ccx_2.23/src/initialnet.f b/ccx_2.23/src/initialnet.f
-index ed7c5bc..7e3d9ef 100644
---- a/ccx_2.23/src/initialnet.f
-+++ b/ccx_2.23/src/initialnet.f
+diff --git a/ccx_2.24/src/initialnet.f b/ccx_2.24/src/initialnet.f
+index f2a9463..a95fd7c 100644
+--- a/ccx_2.24/src/initialnet.f
++++ b/ccx_2.24/src/initialnet.f
 @@ -503,7 +503,7 @@ c     enddo
  !     
        do i=1,nflow
