@@ -1,28 +1,8 @@
-# Reject malformed material, user element and load input
-#
-#   - designvariabless: reject an unknown *DESIGN VARIABLES type
-#   - dloads: reject a non-positive element number on *DLOAD
-#   - elastics: reject an *ELASTIC card without data lines
-#   - usermaterials: require a positive CONSTANTS on *USER MATERIAL
-#   - mohrcoulombhardenings: require a preceding *MOHR COULOMB
-#   - userelements: require positive NODES, INTEGRATION POINTS, MAXDOF
-#   - usersections: require a positive CONSTANTS on *USER SECTION
-#   - damageinitiations: reject *DAMAGE INITIATION without CRITERION
-#   - initialconditionss: check element nodes before evaluating sigini
-#   - calinput: stop when no element was defined
-#   - elementcpuload: give one empty range when no element is active
-#   - allocation: initialise nconstants for *DAMAGE INITIATION
-#   - films: reject a non-positive element number on *FILM
-#   - radiates: reject a non-positive element number on *RADIATE
-#
-# Found by fuzzing ccx with malformed variants of 518 input decks under
-# AddressSanitizer, and by review of the code around each crash.
-
-diff --git a/ccx_2.23/src/allocation.f b/ccx_2.23/src/allocation.f
-index 18ccea8..f696005 100644
---- a/ccx_2.23/src/allocation.f
-+++ b/ccx_2.23/src/allocation.f
-@@ -516,6 +516,7 @@
+diff --git a/ccx_2.24/src/allocation.f b/ccx_2.24/src/allocation.f
+index 4e27ac3..90aa801 100644
+--- a/ccx_2.24/src/allocation.f
++++ b/ccx_2.24/src/allocation.f
+@@ -517,6 +517,7 @@
          enddo
        elseif(textpart(1)(1:17).eq.'*DAMAGEINITIATION') then
          ntmatl=0
@@ -30,11 +10,11 @@ index 18ccea8..f696005 100644
  !
          do i=2,n
            if(textpart(i)(1:10).eq.'CRITERION=') then
-diff --git a/ccx_2.23/src/calinput.f b/ccx_2.23/src/calinput.f
-index e7b74d1..1fdbfe4 100644
---- a/ccx_2.23/src/calinput.f
-+++ b/ccx_2.23/src/calinput.f
-@@ -1622,6 +1622,13 @@ c
+diff --git a/ccx_2.24/src/calinput.f b/ccx_2.24/src/calinput.f
+index 0585c21..afa7faf 100644
+--- a/ccx_2.24/src/calinput.f
++++ b/ccx_2.24/src/calinput.f
+@@ -1623,6 +1623,13 @@ c         endif
          nprint=ii
        endif
  !     
@@ -48,10 +28,10 @@ index e7b74d1..1fdbfe4 100644
  !     check whether a material was assigned to each active element
  !     
        ierror=0
-diff --git a/ccx_2.23/src/damageinitiations.f b/ccx_2.23/src/damageinitiations.f
-index f45ae66..8d49d83 100644
---- a/ccx_2.23/src/damageinitiations.f
-+++ b/ccx_2.23/src/damageinitiations.f
+diff --git a/ccx_2.24/src/damageinitiations.f b/ccx_2.24/src/damageinitiations.f
+index 7633132..cfc33db 100644
+--- a/ccx_2.24/src/damageinitiations.f
++++ b/ccx_2.24/src/damageinitiations.f
 @@ -43,6 +43,8 @@
           ier=1
           return
@@ -76,10 +56,10 @@ index f45ae66..8d49d83 100644
  !
  !     the damage initiation is stored as a mechanical user material
  !
-diff --git a/ccx_2.23/src/designvariabless.f b/ccx_2.23/src/designvariabless.f
-index 7f94bb5..9bc7d33 100644
---- a/ccx_2.23/src/designvariabless.f
-+++ b/ccx_2.23/src/designvariabless.f
+diff --git a/ccx_2.24/src/designvariabless.f b/ccx_2.24/src/designvariabless.f
+index 7458ccb..440a51b 100644
+--- a/ccx_2.24/src/designvariabless.f
++++ b/ccx_2.24/src/designvariabless.f
 @@ -82,6 +82,15 @@
       &        "*DESIGN VARIABLES%",ier)
           return
@@ -96,24 +76,11 @@ index 7f94bb5..9bc7d33 100644
  !
  !     Add "D" at the end of the name of the designvariable keyword
  !      
-diff --git a/ccx_2.23/src/dloads.f b/ccx_2.23/src/dloads.f
-index 4858458..59b92ce 100644
---- a/ccx_2.23/src/dloads.f
-+++ b/ccx_2.23/src/dloads.f
-@@ -329,7 +329,7 @@ c     BernhardiEnd
- !     
-         read(textpart(1)(1:10),'(i10)',iostat=istat) l
-         if(istat.eq.0) then
--          if(l.gt.ne) then
-+          if((l.gt.ne).or.(l.lt.1)) then
-             write(*,*) '*ERROR reading *DLOAD: element ',l
-             write(*,*) '       is not defined'
-             ier=1
-diff --git a/ccx_2.23/src/elastics.f b/ccx_2.23/src/elastics.f
-index 910144b..7a199bc 100644
---- a/ccx_2.23/src/elastics.f
-+++ b/ccx_2.23/src/elastics.f
-@@ -85,7 +85,14 @@
+diff --git a/ccx_2.24/src/elastics.f b/ccx_2.24/src/elastics.f
+index b798e00..ed49371 100644
+--- a/ccx_2.24/src/elastics.f
++++ b/ccx_2.24/src/elastics.f
+@@ -90,7 +90,14 @@
           do
              call getnewline(inpc,textpart,istat,n,key,iline,ipol,inl,
       &           ipoinp,inp,ipoinpc)
@@ -129,7 +96,7 @@ index 910144b..7a199bc 100644
              ntmat=ntmat+1
              nelcon(2,nmat)=ntmat
              if(ntmat.gt.ntmat_) then
-@@ -144,7 +151,14 @@
+@@ -149,7 +156,14 @@
           do
              call getnewline(inpc,textpart,istat,n,key,iline,ipol,inl,
       &           ipoinp,inp,ipoinpc)
@@ -145,7 +112,7 @@ index 910144b..7a199bc 100644
              ntmat=ntmat+1
              nelcon(2,nmat)=ntmat
              if(ntmat.gt.ntmat_) then
-@@ -223,7 +237,14 @@
+@@ -228,7 +242,14 @@
           do
              call getnewline(inpc,textpart,istat,n,key,iline,ipol,inl,
       &           ipoinp,inp,ipoinpc)
@@ -161,10 +128,10 @@ index 910144b..7a199bc 100644
              ntmat=ntmat+1
              nelcon(2,nmat)=ntmat
              if(ntmat.gt.ntmat_) then
-diff --git a/ccx_2.23/src/elementcpuload.c b/ccx_2.23/src/elementcpuload.c
-index 32897aa..2a6d3df 100644
---- a/ccx_2.23/src/elementcpuload.c
-+++ b/ccx_2.23/src/elementcpuload.c
+diff --git a/ccx_2.24/src/elementcpuload.c b/ccx_2.24/src/elementcpuload.c
+index cbedc5d..1ce5396 100644
+--- a/ccx_2.24/src/elementcpuload.c
++++ b/ccx_2.24/src/elementcpuload.c
 @@ -42,6 +42,17 @@ void elementcpuload(ITG *neapar,ITG *nebpar,ITG *ne,ITG *ipkon,ITG *num_cpus){
  	    nepar++;
  	}
@@ -183,11 +150,11 @@ index 32897aa..2a6d3df 100644
      if(nepar<*num_cpus) *num_cpus=nepar;
  
      /* dividing the element number range into num_cpus equal numbers of 
-diff --git a/ccx_2.23/src/films.f b/ccx_2.23/src/films.f
-index c4f1797..4522098 100644
---- a/ccx_2.23/src/films.f
-+++ b/ccx_2.23/src/films.f
-@@ -270,7 +270,7 @@ c     call reorderampl(amname,namta,nam)
+diff --git a/ccx_2.24/src/films.f b/ccx_2.24/src/films.f
+index 1aef739..e709d1c 100644
+--- a/ccx_2.24/src/films.f
++++ b/ccx_2.24/src/films.f
+@@ -277,7 +277,7 @@ c     call reorderampl(amname,namta,nam)
  !     
          read(textpart(1)(1:10),'(i10)',iostat=istat) l
          if(istat.eq.0) then
@@ -196,10 +163,10 @@ index c4f1797..4522098 100644
              write(*,*) '*ERROR reading *FILM: element ',l
              write(*,*) '       is not defined'
              ier=1
-diff --git a/ccx_2.23/src/initialconditionss.f b/ccx_2.23/src/initialconditionss.f
-index a58303a..ea06535 100644
---- a/ccx_2.23/src/initialconditionss.f
-+++ b/ccx_2.23/src/initialconditionss.f
+diff --git a/ccx_2.24/src/initialconditionss.f b/ccx_2.24/src/initialconditionss.f
+index 449e618..83ca52f 100644
+--- a/ccx_2.24/src/initialconditionss.f
++++ b/ccx_2.24/src/initialconditionss.f
 @@ -231,6 +231,13 @@ c                    t1(k)=temperature
  !     
                  do j=1,nope
@@ -214,10 +181,10 @@ index a58303a..ea06535 100644
                    do k=1,3
                      xl(k,j)=co(k,konl(j))
                    enddo
-diff --git a/ccx_2.23/src/mohrcoulombhardenings.f b/ccx_2.23/src/mohrcoulombhardenings.f
-index 2748375..e48a492 100644
---- a/ccx_2.23/src/mohrcoulombhardenings.f
-+++ b/ccx_2.23/src/mohrcoulombhardenings.f
+diff --git a/ccx_2.24/src/mohrcoulombhardenings.f b/ccx_2.24/src/mohrcoulombhardenings.f
+index 5207e18..448f5ba 100644
+--- a/ccx_2.24/src/mohrcoulombhardenings.f
++++ b/ccx_2.24/src/mohrcoulombhardenings.f
 @@ -56,7 +56,15 @@
          ier=1
          return
@@ -235,11 +202,11 @@ index 2748375..e48a492 100644
        iperturb(1)=3
  !     
        do i=2,n
-diff --git a/ccx_2.23/src/radiates.f b/ccx_2.23/src/radiates.f
-index 82f6f39..f7c0812 100644
---- a/ccx_2.23/src/radiates.f
-+++ b/ccx_2.23/src/radiates.f
-@@ -296,7 +296,7 @@ c     call reorderampl(amname,namta,nam)
+diff --git a/ccx_2.24/src/radiates.f b/ccx_2.24/src/radiates.f
+index bf5b750..be5ddfb 100644
+--- a/ccx_2.24/src/radiates.f
++++ b/ccx_2.24/src/radiates.f
+@@ -291,7 +291,7 @@
  !     
          read(textpart(1)(1:10),'(i10)',iostat=istat) l
          if(istat.eq.0) then
@@ -248,10 +215,10 @@ index 82f6f39..f7c0812 100644
              write(*,*) '*ERROR reading *RADIATE: element ',l
              write(*,*) '       is not defined'
              ier=1
-diff --git a/ccx_2.23/src/userelements.f b/ccx_2.23/src/userelements.f
-index 2fe3cb7..c06eb6a 100644
---- a/ccx_2.23/src/userelements.f
-+++ b/ccx_2.23/src/userelements.f
+diff --git a/ccx_2.24/src/userelements.f b/ccx_2.24/src/userelements.f
+index b6c77c5..dff4a16 100644
+--- a/ccx_2.24/src/userelements.f
++++ b/ccx_2.24/src/userelements.f
 @@ -31,6 +31,9 @@
       &  inl,ipol
  !
@@ -292,10 +259,10 @@ index 2fe3cb7..c06eb6a 100644
  !
        if(intpoints.gt.255) then
           write(*,*) '*ERROR reading *USER ELEMENT'
-diff --git a/ccx_2.23/src/usermaterials.f b/ccx_2.23/src/usermaterials.f
-index 49fbe94..b7d27af 100644
---- a/ccx_2.23/src/usermaterials.f
-+++ b/ccx_2.23/src/usermaterials.f
+diff --git a/ccx_2.24/src/usermaterials.f b/ccx_2.24/src/usermaterials.f
+index f07cd1d..05cfe9f 100644
+--- a/ccx_2.24/src/usermaterials.f
++++ b/ccx_2.24/src/usermaterials.f
 @@ -54,6 +54,7 @@
        endif
  !
@@ -320,10 +287,10 @@ index 49fbe94..b7d27af 100644
  !
        if(imech.eq.1) then
  !
-diff --git a/ccx_2.23/src/usersections.f b/ccx_2.23/src/usersections.f
-index 2b9a1e9..4f4d0b2 100644
---- a/ccx_2.23/src/usersections.f
-+++ b/ccx_2.23/src/usersections.f
+diff --git a/ccx_2.24/src/usersections.f b/ccx_2.24/src/usersections.f
+index 1a80fbf..aa57962 100644
+--- a/ccx_2.24/src/usersections.f
++++ b/ccx_2.24/src/usersections.f
 @@ -47,6 +47,8 @@
          ier=1
          return

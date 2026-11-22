@@ -1,40 +1,17 @@
-diff --git a/ccx_2.23/src/ccx_2.23.c b/ccx_2.23/src/ccx_2.23.c
-index ae42102..af5236a 100644
---- a/ccx_2.23/src/ccx_2.23.c
-+++ b/ccx_2.23/src/ccx_2.23.c
-@@ -15,10 +15,6 @@
- /*     along with this program; if not, write to the Free Software       */
- /*     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.         */
+diff --git a/ccx_2.24/src/ccx_2.24.c b/ccx_2.24/src/ccx_2.24.c
+index c1db83b..3a46f56 100644
+--- a/ccx_2.24/src/ccx_2.24.c
++++ b/ccx_2.24/src/ccx_2.24.c
+@@ -112,7 +112,7 @@ int main(int argc,char *argv[])
  
--#ifdef __WIN32
--_set_output_format(_TWO_DIGIT_EXPONENT);
--#endif
--
- #ifdef CALCULIX_MPI
- #include <spoolesMPI.h>
- #endif
-@@ -37,7 +33,10 @@ struct timespec totalCalculixTimeStart,totalCalculixTimeEnd;
- 
- int main(int argc,char *argv[])
- {
--  
-+#ifdef _MSC_VER
-+_set_output_format(_TWO_DIGIT_EXPONENT);
-+#endif
-+
-   FILE *f1;
-     
-   char *sideload=NULL,*set=NULL,*matname=NULL,*orname=NULL,*amname=NULL,
-@@ -112,7 +111,7 @@ int main(int argc,char *argv[])
-   MPI_Comm_size(MPI_COMM_WORLD, &nproc) ;
- #endif
- 
+   setlocale(LC_NUMERIC,"C");
+   
 -  clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeStart);
 +  // clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeStart);
  
    if(argc==1){printf("Usage: CalculiX.exe -i jobname\n");FORTRAN(stop,());}
    else{
-@@ -1907,16 +1906,16 @@ int main(int argc,char *argv[])
+@@ -1970,16 +1970,16 @@ int main(int argc,char *argv[])
    calculix_freeExternalBehaviours();
  #endif /* CALCULIX_EXTERNAL_BEHAVIOURS_SUPPORT */
  
@@ -57,32 +34,11 @@ index ae42102..af5236a 100644
  
    return 0;
        
-diff --git a/ccx_2.23/src/ccx_2.23step.c b/ccx_2.23/src/ccx_2.23step.c
-index a6aa1c0..e55ed79 100644
---- a/ccx_2.23/src/ccx_2.23step.c
-+++ b/ccx_2.23/src/ccx_2.23step.c
-@@ -15,10 +15,6 @@
- /*     along with this program; if not, write to the Free Software       */
- /*     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.         */
- 
--#ifdef __WIN32
--_set_output_format(_TWO_DIGIT_EXPONENT);
--#endif
--
- #ifdef CALCULIX_MPI
- #include <spoolesMPI.h>
- #endif
-@@ -44,6 +40,9 @@ void CalculiXstep(int argc,char argv[][133],ITG **nelemloadp,double **xloadp,
-                   ITG *inputsteps,ITG *iperturb,ITG *irstrt,char **filabp,
-                   ITG *nlabel)
- {
-+#ifdef _MSC_VER
-+_set_output_format(_TWO_DIGIT_EXPONENT);
-+#endif
- 
-   /* in FORTRAN convention:
- 
-@@ -259,7 +258,7 @@ void CalculiXstep(int argc,char argv[][133],ITG **nelemloadp,double **xloadp,
+diff --git a/ccx_2.24/src/ccx_2.24step.c b/ccx_2.24/src/ccx_2.24step.c
+index bffdecd..b5833fb 100644
+--- a/ccx_2.24/src/ccx_2.24step.c
++++ b/ccx_2.24/src/ccx_2.24step.c
+@@ -259,7 +259,7 @@ void CalculiXstep(int argc,char argv[][133],ITG **nelemloadp,double **xloadp,
      // end change DLR
  
     
@@ -91,26 +47,26 @@ index a6aa1c0..e55ed79 100644
  
      if(argc==1){printf("Usage: CalculiX.exe -i jobname\n");FORTRAN(stop,());}
      else{
-@@ -2055,16 +2054,16 @@ void CalculiXstep(int argc,char argv[][133],ITG **nelemloadp,double **xloadp,
+@@ -2072,16 +2072,16 @@ void CalculiXstep(int argc,char argv[][133],ITG **nelemloadp,double **xloadp,
    calculix_freeExternalBehaviours();
  #endif /* CALCULIX_EXTERNAL_BEHAVIOURS_SUPPORT */
  
 -  clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeEnd); 
-+  // clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeEnd); 
++//   clock_gettime(CLOCK_MONOTONIC, &totalCalculixTimeEnd); 
  
 -  totalCalculixTime = (totalCalculixTimeEnd.tv_sec - totalCalculixTimeStart.tv_sec) * 1e9; 
 -  totalCalculixTime = (totalCalculixTime + (totalCalculixTimeEnd.tv_nsec - totalCalculixTimeStart.tv_nsec)) * 1e-9;
-+  // totalCalculixTime = (totalCalculixTimeEnd.tv_sec - totalCalculixTimeStart.tv_sec) * 1e9; 
-+  // totalCalculixTime = (totalCalculixTime + (totalCalculixTimeEnd.tv_nsec - totalCalculixTimeStart.tv_nsec)) * 1e-9;
++//   totalCalculixTime = (totalCalculixTimeEnd.tv_sec - totalCalculixTimeStart.tv_sec) * 1e9; 
++//   totalCalculixTime = (totalCalculixTime + (totalCalculixTimeEnd.tv_nsec - totalCalculixTimeStart.tv_nsec)) * 1e-9;
    
 -  printf("________________________________________\n\n");
-+  // printf("________________________________________\n\n");
++//   printf("________________________________________\n\n");
    
 -  printf("Total CalculiX Time: %lf\n", totalCalculixTime);
-+  // printf("Total CalculiX Time: %lf\n", totalCalculixTime);
++//   printf("Total CalculiX Time: %lf\n", totalCalculixTime);
  
 -  printf("________________________________________\n");
-+  // printf("________________________________________\n");
++//   printf("________________________________________\n");
  
    return;
        

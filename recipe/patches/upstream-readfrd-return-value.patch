@@ -1,7 +1,7 @@
-diff --git a/ccx_2.23/src/getglobalresults.c b/ccx_2.23/src/getglobalresults.c
+diff --git a/ccx_2.24/src/getglobalresults.c b/ccx_2.24/src/getglobalresults.c
 index f93902e..7d9fd4b 100644
---- a/ccx_2.23/src/getglobalresults.c
-+++ b/ccx_2.23/src/getglobalresults.c
+--- a/ccx_2.24/src/getglobalresults.c
++++ b/ccx_2.24/src/getglobalresults.c
 @@ -176,7 +176,15 @@ void getglobalresults (char *masterfile,ITG **integerglobp,double **doubleglobp,
  //    anz->nnext=0;
  //    anz->enext=0;
@@ -19,10 +19,10 @@ index f93902e..7d9fd4b 100644
      
      /* calculation of the highest node number */
      
-diff --git a/ccx_2.23/src/getuncrackedresults.c b/ccx_2.23/src/getuncrackedresults.c
+diff --git a/ccx_2.24/src/getuncrackedresults.c b/ccx_2.24/src/getuncrackedresults.c
 index d4d9608..5212061 100644
---- a/ccx_2.23/src/getuncrackedresults.c
-+++ b/ccx_2.23/src/getuncrackedresults.c
+--- a/ccx_2.24/src/getuncrackedresults.c
++++ b/ccx_2.24/src/getuncrackedresults.c
 @@ -110,7 +110,15 @@ void getuncrackedresults (char *masterfile,ITG **integerglobp,
  //    anz->nnext=0;
  //    anz->enext=0;
@@ -40,10 +40,10 @@ index d4d9608..5212061 100644
      
      /* calculation of the highest node number */
      
-diff --git a/ccx_2.23/src/utempread.c b/ccx_2.23/src/utempread.c
+diff --git a/ccx_2.24/src/utempread.c b/ccx_2.24/src/utempread.c
 index 9d283d7..13465cb 100644
---- a/ccx_2.23/src/utempread.c
-+++ b/ccx_2.23/src/utempread.c
+--- a/ccx_2.24/src/utempread.c
++++ b/ccx_2.24/src/utempread.c
 @@ -70,7 +70,15 @@ void utempread (double *t1,ITG *istep,char *jobnamec)
      anz->nnext=0;
      anz->enext=0;

@@ -1,28 +1,8 @@
-# Reject malformed and truncated input decks
-#
-#   - allocation: reserve a temperature slot for *SPECIFIC GAS CONSTANT
-#   - readinput: reject an input deck without any keyword card
-#   - allocation: do not skip continuation lines past the end of a block
-#   - *NODE/EL/SECTION/CONTACT PRINT: stop reading at the end of the input
-#   - calinput: stop skipping to the next keyword at the end of the input
-#   - surfaces: reject non-positive element numbers, skip set members above ne
-#   - couplings: require a valid REF NODE on *COUPLING
-#   - mpcs: reject *MPC node numbers that do not exist
-#   - noelsets: reject non-positive node/element numbers in *NSET/*ELSET
-#   - usermaterials: reject data lines with more entries than CONSTANTS allows
-#   - arpack: stop when dsaupd/dnaupd fail instead of calling d[n,s]eupd
-#   - rigidbodys: reject negative REF NODE and ROT NODE on *RIGID BODY
-#   - dloads: skip an empty element set or facial surface
-#   - pretensionsections: reject an empty surface
-#
-# Found by fuzzing ccx with malformed variants of 518 input decks under
-# AddressSanitizer, and by review of the code around each crash.
-
-diff --git a/ccx_2.23/src/allocation.f b/ccx_2.23/src/allocation.f
-index f696005..9c801d7 100644
---- a/ccx_2.23/src/allocation.f
-+++ b/ccx_2.23/src/allocation.f
-@@ -378,6 +378,13 @@
+diff --git a/ccx_2.24/src/allocation.f b/ccx_2.24/src/allocation.f
+index 90aa801..a4caaa4 100644
+--- a/ccx_2.24/src/allocation.f
++++ b/ccx_2.24/src/allocation.f
+@@ -379,6 +379,13 @@
            ntmatl=ntmatl+1
            ntmat_=max(ntmatl,ntmat_)
          enddo
@@ -36,7 +16,7 @@ index f696005..9c801d7 100644
        elseif(textpart(1)(1:11).eq.'*CONSTRAINT') then
          do
            call getnewline(inpc,textpart,istat,n,key,iline,ipol,inl,
-@@ -872,7 +879,9 @@ c          endif
+@@ -874,7 +881,9 @@ c          endif
       &           inl,ipoinp,inp,ipoinpc)
              if((istat.lt.0).or.(key.eq.1)) exit
              ntmatl=ntmatl+1
@@ -47,7 +27,7 @@ index f696005..9c801d7 100644
            enddo
            ntmat_=max(ntmatl,ntmat_)
          elseif(ityp.eq.21) then
-@@ -881,7 +890,12 @@ c          endif
+@@ -883,7 +892,12 @@ c          endif
       &           inl,ipoinp,inp,ipoinpc)
              if((istat.lt.0).or.(key.eq.1)) exit
              ntmatl=ntmatl+1
@@ -61,7 +41,7 @@ index f696005..9c801d7 100644
            enddo
            ntmat_=max(ntmatl,ntmat_)
          endif
-@@ -1508,7 +1522,9 @@ c            nmpc_=nmpc_+3
+@@ -1535,7 +1549,9 @@ c            nmpc_=nmpc_+3
              if((istat.lt.0).or.(key.eq.1)) exit
              ntmatl=ntmatl+1
              ntmat_=max(ntmatl,ntmat_)
@@ -72,7 +52,7 @@ index f696005..9c801d7 100644
            enddo
          endif
        elseif(textpart(1)(1:10).eq.'*HYPERFOAM') then
-@@ -1542,7 +1558,9 @@ c            nmpc_=nmpc_+3
+@@ -1569,7 +1585,9 @@ c            nmpc_=nmpc_+3
              if((istat.lt.0).or.(key.eq.1)) exit
              ntmatl=ntmatl+1
              ntmat_=max(ntmatl,ntmat_)
@@ -83,11 +63,11 @@ index f696005..9c801d7 100644
            enddo
          endif
        elseif(textpart(1)(2:10).eq.'KINEMATIC') then
-diff --git a/ccx_2.23/src/arpack.c b/ccx_2.23/src/arpack.c
-index a04b14f..7ca1b40 100644
---- a/ccx_2.23/src/arpack.c
-+++ b/ccx_2.23/src/arpack.c
-@@ -842,8 +842,9 @@ void arpack(double *co, ITG *nk, ITG **konp, ITG **ipkonp, char **lakonp,
+diff --git a/ccx_2.24/src/arpack.c b/ccx_2.24/src/arpack.c
+index 2fdf6d9..525d60c 100644
+--- a/ccx_2.24/src/arpack.c
++++ b/ccx_2.24/src/arpack.c
+@@ -853,8 +853,9 @@ void arpack(double *co, ITG *nk, ITG **konp, ITG **ipkonp, char **lakonp,
      if(info!=0){
        printf(" *ERROR in d[n,s]aupd: info=%" ITGFORMAT "\n",info);
        printf("       # of converged eigenvalues=%" ITGFORMAT "\n\n",iparam[4]);
@@ -99,11 +79,11 @@ index a04b14f..7ca1b40 100644
      NNEW(select,ITG,ncv);
      
      if(nasym==1){
-diff --git a/ccx_2.23/src/calinput.f b/ccx_2.23/src/calinput.f
-index 1fdbfe4..536a067 100644
---- a/ccx_2.23/src/calinput.f
-+++ b/ccx_2.23/src/calinput.f
-@@ -266,6 +266,13 @@
+diff --git a/ccx_2.24/src/calinput.f b/ccx_2.24/src/calinput.f
+index afa7faf..cf60668 100644
+--- a/ccx_2.24/src/calinput.f
++++ b/ccx_2.24/src/calinput.f
+@@ -265,6 +265,13 @@
        loop: do
  !     
        if(istat.lt.0) then
@@ -126,11 +106,11 @@ index 1fdbfe4..536a067 100644
          enddo
          ier=2
        endif
-diff --git a/ccx_2.23/src/calinput_rfn.f b/ccx_2.23/src/calinput_rfn.f
-index 5927870..4bac0d0 100644
---- a/ccx_2.23/src/calinput_rfn.f
-+++ b/ccx_2.23/src/calinput_rfn.f
-@@ -99,7 +99,7 @@
+diff --git a/ccx_2.24/src/calinput_rfn.f b/ccx_2.24/src/calinput_rfn.f
+index feec1cf..5b0e4b0 100644
+--- a/ccx_2.24/src/calinput_rfn.f
++++ b/ccx_2.24/src/calinput_rfn.f
+@@ -98,7 +98,7 @@
            do
              call getnewline(inpc,textpart,istatrfn,n,key,iline,ipol,inl,
       &           ipoinp,inp,ipoinpc)
@@ -139,10 +119,10 @@ index 5927870..4bac0d0 100644
            enddo
            ier=2
          endif
-diff --git a/ccx_2.23/src/contactprints.f b/ccx_2.23/src/contactprints.f
-index 87b02e4..537955e 100644
---- a/ccx_2.23/src/contactprints.f
-+++ b/ccx_2.23/src/contactprints.f
+diff --git a/ccx_2.24/src/contactprints.f b/ccx_2.24/src/contactprints.f
+index cf47873..4e657ee 100644
+--- a/ccx_2.24/src/contactprints.f
++++ b/ccx_2.24/src/contactprints.f
 @@ -172,7 +172,7 @@ c      jout=max(jout,1)
        do
           call getnewline(inpc,textpart,istat,n,key,iline,ipol,inl,
@@ -152,10 +132,10 @@ index 87b02e4..537955e 100644
           do ii=1,n
              if((textpart(ii)(1:4).ne.'CSTR').and.
       &         (textpart(ii)(1:4).ne.'CELS').and.
-diff --git a/ccx_2.23/src/couplings.f b/ccx_2.23/src/couplings.f
-index 0aeec20..7737fab 100644
---- a/ccx_2.23/src/couplings.f
-+++ b/ccx_2.23/src/couplings.f
+diff --git a/ccx_2.24/src/couplings.f b/ccx_2.24/src/couplings.f
+index 3f2c998..06cf65e 100644
+--- a/ccx_2.24/src/couplings.f
++++ b/ccx_2.24/src/couplings.f
 @@ -108,6 +108,7 @@
        enddo
  !     
@@ -163,8 +143,8 @@ index 0aeec20..7737fab 100644
 +      irefnode=0
        do i=2,n
          if(textpart(i)(1:8).eq.'REFNODE=') then
-           read(textpart(i)(9:18),'(i10)',iostat=istat) irefnode
-@@ -176,6 +177,15 @@
+            read(textpart(i)(9:18),'(i10)',iostat=istat) irefnode
+@@ -199,6 +200,15 @@
       &       "*COUPLING%",ier)
          return
        endif
@@ -180,11 +160,11 @@ index 0aeec20..7737fab 100644
  !     
        if(orientation.eq.'                    ') then
          iorientation=0
-diff --git a/ccx_2.23/src/dloads.f b/ccx_2.23/src/dloads.f
-index 59b92ce..b9fdcc5 100644
---- a/ccx_2.23/src/dloads.f
-+++ b/ccx_2.23/src/dloads.f
-@@ -457,6 +457,13 @@ c          enddo
+diff --git a/ccx_2.24/src/dloads.f b/ccx_2.24/src/dloads.f
+index 2c74afd..35db0d2 100644
+--- a/ccx_2.24/src/dloads.f
++++ b/ccx_2.24/src/dloads.f
+@@ -469,6 +469,13 @@ c     BernhardiEnd
              call bodyadd(cbody,ibody,xbody,nbody,nbody_,elset,label,
       &           iamplitude,xmagnitude,p1,p2,bodyf,xbodyold,lc,idefbody)
            else
@@ -198,11 +178,11 @@ index 59b92ce..b9fdcc5 100644
              l=ialset(istartset(i))
              if(surface) then
                write(label(2:2),'(i1)') l-10*(l/10)
-diff --git a/ccx_2.23/src/elprints.f b/ccx_2.23/src/elprints.f
-index ac99506..e727138 100644
---- a/ccx_2.23/src/elprints.f
-+++ b/ccx_2.23/src/elprints.f
-@@ -194,7 +194,7 @@ c          enddo
+diff --git a/ccx_2.24/src/elprints.f b/ccx_2.24/src/elprints.f
+index 9e4fdb8..809d8bc 100644
+--- a/ccx_2.24/src/elprints.f
++++ b/ccx_2.24/src/elprints.f
+@@ -195,7 +195,7 @@ c          enddo
        do
           call getnewline(inpc,textpart,istat,n,key,iline,ipol,inl,
       &        ipoinp,inp,ipoinpc)
@@ -211,11 +191,11 @@ index ac99506..e727138 100644
           do ii=1,n
              if(textpart(ii)(1:4).eq.'PEEQ') then
                 if((nmethod.eq.2).or.(nmethod.eq.3)) then
-diff --git a/ccx_2.23/src/mpcs.f b/ccx_2.23/src/mpcs.f
-index 9e7fef2..7433b0c 100644
---- a/ccx_2.23/src/mpcs.f
-+++ b/ccx_2.23/src/mpcs.f
-@@ -146,6 +146,13 @@ c     enddo
+diff --git a/ccx_2.24/src/mpcs.f b/ccx_2.24/src/mpcs.f
+index 0b663e6..7cf1c8a 100644
+--- a/ccx_2.24/src/mpcs.f
++++ b/ccx_2.24/src/mpcs.f
+@@ -141,6 +141,13 @@
                    inode=inode-1
                    cycle
                 endif
@@ -229,11 +209,11 @@ index 9e7fef2..7433b0c 100644
                 if(label(1:8).eq.'STRAIGHT') then
                    call straightmpc(ipompc,nodempc,coefmpc,
       &                 labmpc,nmpc,nmpc_,mpcfree,ikmpc,ilmpc,
-diff --git a/ccx_2.23/src/nodeprints.f b/ccx_2.23/src/nodeprints.f
-index 0fe8a17..6d66f60 100644
---- a/ccx_2.23/src/nodeprints.f
-+++ b/ccx_2.23/src/nodeprints.f
-@@ -194,7 +194,7 @@
+diff --git a/ccx_2.24/src/nodeprints.f b/ccx_2.24/src/nodeprints.f
+index e51c57d..4b54a92 100644
+--- a/ccx_2.24/src/nodeprints.f
++++ b/ccx_2.24/src/nodeprints.f
+@@ -196,7 +196,7 @@
        do
           call getnewline(inpc,textpart,istat,n,key,iline,ipol,inl,
       &        ipoinp,inp,ipoinpc)
@@ -242,32 +222,11 @@ index 0fe8a17..6d66f60 100644
           do ii=1,n
              if((textpart(ii)(1:4).ne.'U   ').and.
       &         (textpart(ii)(1:4).ne.'NT  ').and.
-diff --git a/ccx_2.23/src/noelsets.f b/ccx_2.23/src/noelsets.f
-index a8babf8..6412827 100644
---- a/ccx_2.23/src/noelsets.f
-+++ b/ccx_2.23/src/noelsets.f
-@@ -347,6 +347,16 @@ ccc   to remove end
- !     
- !     node or element number
- !     
-+              if(ialset(nalset+1).le.0) then
-+                write(*,*) 
-+     &               '*ERROR reading *NSET/ELSET: value ',
-+     &               ialset(nalset+1)
-+                write(*,*) '       in set ',
-+     &               set(iset)(1:index(set(iset),' ')-2),' <= 0'
-+                call inputerror(inpc,ipoinpc,iline,
-+     &               "*NSET or *ELSET%",ier)
-+                return
-+              endif
-               if(kode.eq.0) then
-                 if(ialset(nalset+1).gt.nk) then
-                   write(*,*) 
-diff --git a/ccx_2.23/src/pretensionsections.f b/ccx_2.23/src/pretensionsections.f
-index e372d06..c2e8653 100644
---- a/ccx_2.23/src/pretensionsections.f
-+++ b/ccx_2.23/src/pretensionsections.f
-@@ -213,6 +213,13 @@ c     enddo
+diff --git a/ccx_2.24/src/pretensionsections.f b/ccx_2.24/src/pretensionsections.f
+index 0348528..9c4f912 100644
+--- a/ccx_2.24/src/pretensionsections.f
++++ b/ccx_2.24/src/pretensionsections.f
+@@ -269,6 +269,13 @@ c     enddo
       &        '*ERROR reading *PRE-TENSION SECTION: nonexistent surface'
            write(*,*) '       or surface consists of nodes'
            call inputerror(inpc,ipoinpc,iline,
@@ -281,11 +240,11 @@ index e372d06..c2e8653 100644
       &         "*PRE-TENSION SECTION%",ier)
            return
          endif
-diff --git a/ccx_2.23/src/readinput.c b/ccx_2.23/src/readinput.c
-index ad8f5e6..1f6056f 100644
---- a/ccx_2.23/src/readinput.c
-+++ b/ccx_2.23/src/readinput.c
-@@ -476,6 +476,11 @@ void readinput(char *jobnamec,char **inpcp,ITG *nline,ITG *nset,
+diff --git a/ccx_2.24/src/readinput.c b/ccx_2.24/src/readinput.c
+index 269c765..e883770 100644
+--- a/ccx_2.24/src/readinput.c
++++ b/ccx_2.24/src/readinput.c
+@@ -484,6 +484,11 @@ void readinput(char *jobnamec,char **inpcp,ITG *nline,ITG *nset,
        }
    }while(1);
  
@@ -297,10 +256,10 @@ index ad8f5e6..1f6056f 100644
    inp[3*ipoinp[2*ikey-1]-2]=*nline;
    RENEW(inpc,char,(long long)132**nline);
    
-diff --git a/ccx_2.23/src/rigidbodys.f b/ccx_2.23/src/rigidbodys.f
-index 20f3141..3352a7c 100644
---- a/ccx_2.23/src/rigidbodys.f
-+++ b/ccx_2.23/src/rigidbodys.f
+diff --git a/ccx_2.24/src/rigidbodys.f b/ccx_2.24/src/rigidbodys.f
+index 9439585..833886b 100644
+--- a/ccx_2.24/src/rigidbodys.f
++++ b/ccx_2.24/src/rigidbodys.f
 @@ -113,7 +113,7 @@
       &           "*RIGID BODY%",ier)
              return
@@ -319,10 +278,10 @@ index 20f3141..3352a7c 100644
              write(*,*) '*ERROR reading *RIGID BODY: rot node',
       &           irotnode
              write(*,*) '       has not been defined'
-diff --git a/ccx_2.23/src/sectionprints.f b/ccx_2.23/src/sectionprints.f
-index bdf74a8..4959a15 100644
---- a/ccx_2.23/src/sectionprints.f
-+++ b/ccx_2.23/src/sectionprints.f
+diff --git a/ccx_2.24/src/sectionprints.f b/ccx_2.24/src/sectionprints.f
+index 25c301d..93bfba1 100644
+--- a/ccx_2.24/src/sectionprints.f
++++ b/ccx_2.24/src/sectionprints.f
 @@ -172,7 +172,7 @@ c          enddo
        do
           call getnewline(inpc,textpart,istat,n,key,iline,ipol,inl,
@@ -332,10 +291,10 @@ index bdf74a8..4959a15 100644
           loop: do ii=1,n
              if((textpart(ii)(1:4).ne.'DRAG').and.
       &         (textpart(ii)(1:4).ne.'FLUX').and.
-diff --git a/ccx_2.23/src/surfaces.f b/ccx_2.23/src/surfaces.f
-index 0ea8b82..546910f 100644
---- a/ccx_2.23/src/surfaces.f
-+++ b/ccx_2.23/src/surfaces.f
+diff --git a/ccx_2.24/src/surfaces.f b/ccx_2.24/src/surfaces.f
+index 361290c..15f51f4 100644
+--- a/ccx_2.24/src/surfaces.f
++++ b/ccx_2.24/src/surfaces.f
 @@ -303,6 +303,12 @@
                  if(l.gt.0) then
                    kstart=kend
@@ -376,10 +335,10 @@ index 0ea8b82..546910f 100644
                write(*,*) '*WARNING reading *SURFACE: element ',
       &             l
                write(*,*) '         in set ',set(iset),' > ne'
-diff --git a/ccx_2.23/src/usermaterials.f b/ccx_2.23/src/usermaterials.f
-index b7d27af..6e943a1 100644
---- a/ccx_2.23/src/usermaterials.f
-+++ b/ccx_2.23/src/usermaterials.f
+diff --git a/ccx_2.24/src/usermaterials.f b/ccx_2.24/src/usermaterials.f
+index 05cfe9f..2883bac 100644
+--- a/ccx_2.24/src/usermaterials.f
++++ b/ccx_2.24/src/usermaterials.f
 @@ -122,6 +122,14 @@
                 if(8*j.gt.nconstants+1) then
                    imax=nconstants-8*j+9

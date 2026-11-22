@@ -14,54 +14,26 @@ source:
   sha256: ${{ sha256 }}
   patches:
     - patches/avoid-ifport.patch
-    - patches/fix-readnewmesh-return.patch
-    # submitted upstream; drop these when they land in a release
-    - patches/upstream-f2f-contact-array-bounds.patch
-    - patches/upstream-frictionless-contact-slip.patch
-    - patches/upstream-nonlinmpc-straight-mpc.patch
+    # 2.24 moved the sources from ccx_2.23/ to ccx_2.24/, so every patch
+    # below was regenerated against the new tree.  The fixes that were taken
+    # upstream are no longer carried: they are in 2.24 itself.
+    #
+    # still submitted upstream, not in 2.24
     - patches/upstream-mohrcoulomb-degenerate-return.patch
     - patches/upstream-readfrd-return-value.patch
-    - patches/upstream-locale-numeric.patch
-    - patches/upstream-makefile-inc-mafillmm.patch
-    # threaded *CFD applied MPC's before the SPC's they read; fixed upstream
-    # by the OpenMP rewrite of compfluidfem (9e8ce89); drop once released
-    - patches/fix-cfd-threaded-boundary-conditions.patch
     # 2.23 creates and joins threads for every loop of every *CFD iteration,
     # so small meshes run several times slower threaded than on one core
     - patches/fix-cfd-small-mesh-threads.patch
-    # defects Dhondt fixed upstream after 2.23 was posted (2 Nov 2025), up to
-    # e9e57ed of 17 Sep 2026; drop these when 2.24 is released
-    - patches/upstream-initial-conditions-solution.patch
-    - patches/upstream-boundary-fixed-cylindrical.patch
-    - patches/upstream-gen3dnor-expansion-normals.patch
-    - patches/upstream-materialdata-th-density.patch
-    - patches/upstream-nonlingeo-intscheme.patch
-    - patches/upstream-c3d8r-stable-time-increment.patch
-    - patches/upstream-allocation-debug-print.patch
-    - patches/upstream-friction-stick-slope.patch
-    # 88e8f90 (20 Jan 2026), missed above because its message is empty
-    - patches/upstream-e-c3d-rhs-th-dflux-arguments.patch
-    # b164a60 (5 Dec 2025, a squashed commit) and 428d10e (19 Dec 2025)
-    # nest guards that read null arrays; also missed above
-    - patches/upstream-null-array-guards.patch
     # a rotational SPC or moment on a plane stress, plane strain or
     # axisymmetric node reaches the mean rotation code, which sets its loop
     # bounds only for shells and beams; FreeCAD/FreeCAD#10865
     - patches/fix-2d-rotational-dofs.patch
-    # calls that pass fewer arguments than the callee declares, found by
-    # compiling every Fortran unit as one file: the callee dereferences
-    # whatever follows the last argument actually passed
-    - patches/fix-missing-ier-arguments.patch
-    - patches/fix-extrapolate-se-beam-sections.patch
     # found by AddressSanitizer and by poisoning uninitialised memory over
     # CalculiX's suite and FreeCAD's FEM test models
-    - patches/fix-electromagnetics-ithermal-array.patch
     - patches/fix-cd-lab-correction-edges.patch
-    - patches/fix-calinput-cs-guard.patch
     # calls whose arguments do not line up with the routine called, found by
     # checking every call against its callee
     - patches/fix-flux-rcavi-physcon.patch
-    - patches/fix-orifice-curve-integer.patch
     # face-to-face contact with PRESSURE-OVERCLOSURE=TABULAR used the old
     # 82-entry layout of plconloc that materialdata_sp.f no longer fills
     - patches/fix-f2f-tabular-overclosure.patch
@@ -80,10 +52,10 @@ source:
     - patches/fix-fluid-network-labels.patch
     - patches/fix-malformed-input-misc.patch
     - patches/fix-malformed-input-followups.patch
+    # mingw has no clock_gettime and the timing print was already disabled
+    # on Windows and macOS before 2.24; keep it that way
     - if: win or osx
       then: patches/mingw_time.patch
-    - if: win
-      then: patches/fix-win-locale.patch
 
 build:
   number: 0
